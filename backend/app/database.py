@@ -1,15 +1,23 @@
 # app/database.py
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
+import os
+from dotenv import load_dotenv
 
-DATABASE_URL = "sqlite:///./mentor.db"  # For testing; replace with PostgreSQL/MySQL in production
+load_dotenv()  # Load .env file
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+DATABASE_URL = os.getenv("DATABASE_URL")  # e.g., postgresql://postgres:password@localhost:5432/mentorship
+
+# Create engine
+engine = create_engine(DATABASE_URL)
+
+# Session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base class for models
 Base = declarative_base()
 
-# Dependency
+# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:

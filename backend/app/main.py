@@ -1,34 +1,36 @@
 # app/main.py
+
 from fastapi import FastAPI
+from app.database import engine
+from app import models
+
 from app.routes.auth_routes import router as auth_router
 from app.routes.profile_routes import router as profile_router
-from app.database import Base, engine
-from app.routes import auth_routes
+from app.routes.session_routes import router as session_router
 
-# -------------------------
-# Create FastAPI instance
-# -------------------------
-app = FastAPI(title="Mentoralab API")
+# ======================
+# CREATE DATABASE TABLES
+# ======================
+models.Base.metadata.create_all(bind=engine)
 
-# -------------------------
-# Include Routers
-# -------------------------
-app.include_router(auth_router)
-app.include_router(profile_router)
-
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# ======================
+# FASTAPI APP
+# ======================
+app = FastAPI(
+    title="Mentorship Platform API",
+    version="2.0"
 )
 
-# Create all tables
-Base.metadata.create_all(bind=engine)
+# ======================
+# ROUTES
+# ======================
+app.include_router(auth_router)
+app.include_router(profile_router)
+app.include_router(session_router)
 
-
-# Include routes
-app.include_router(auth_routes.router)
+# ======================
+# HEALTH CHECK
+# ======================
+@app.get("/")
+def root():
+    return {"status": "Mentorship Platform API running"}

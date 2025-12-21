@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 test('homepage shows title and demo notes', async ({ page }) => {
   await page.goto(process.env.FRONTEND_TEST_URL || 'http://localhost:4173');
