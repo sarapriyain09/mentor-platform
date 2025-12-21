@@ -74,3 +74,25 @@ jobs:
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
             -d '{}' || echo "Render deploy failed"
+
+        - name: Upload frontend build artifact
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-dist
+            path: frontend/dist
+
+        - name: Smoke tests against deployed backend (if REACT_APP_API_URL secret set)
+          env:
+            DEPLOYED_BACKEND: ${{ secrets.REACT_APP_API_URL }}
+          run: |
+            if [ -z "$DEPLOYED_BACKEND" ]; then
+              echo "No REACT_APP_API_URL secret set; skipping smoke tests against deployed backend.";
+              exit 0;
+            fi
+
+            echo "Checking backend root: $DEPLOYED_BACKEND"
+            curl -f "$DEPLOYED_BACKEND/" || (echo "Backend root check failed" && exit 1)
+
+            echo "Checking demo notes endpoint: $DEPLOYED_BACKEND/demo/notes"
+            curl -f "$DEPLOYED_BACKEND/demo/notes" || (echo "Demo notes check failed" && exit 1)
