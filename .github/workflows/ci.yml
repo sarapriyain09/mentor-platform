@@ -96,3 +96,28 @@ jobs:
 
             echo "Checking demo notes endpoint: $DEPLOYED_BACKEND/demo/notes"
             curl -f "$DEPLOYED_BACKEND/demo/notes" || (echo "Demo notes check failed" && exit 1)
+
+        - name: Run Playwright E2E tests against local preview
+          if: ${{ always() }}
+          env:
+            FRONTEND_TEST_URL: http://localhost:4173
+          run: |
+            cd frontend
+            # install playwright browsers
+            npx playwright install --with-deps
+
+            # start preview server in background
+            npx vite preview --port 4173 --strictPort &
+
+            # wait for server
+            npx wait-on http://localhost:4173
+
+            # run playwright tests
+            npx playwright test --config=./node_modules/@playwright/test/playwright.config.js || (echo "Playwright tests failed" && exit 1)
+
+        - name: Upload Playwright report
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: playwright-report
+            path: frontend/playwright-report || true
