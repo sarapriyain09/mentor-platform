@@ -12,6 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check required secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "WARNING: secrets.DATABASE_URL not set"; fi
+          if [ -z "$SECRET_KEY" ]; then echo "WARNING: secrets.SECRET_KEY not set"; fi
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:

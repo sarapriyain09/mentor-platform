@@ -11,6 +11,6 @@
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://your-backend.example.com"
+    "REACT_APP_API_URL": "$REACT_APP_API_URL"
   }
 }

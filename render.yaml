@@ -10,9 +10,11 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: YOUR_DATABASE_URL
+        # Use your secret named `DATABASE_URL` in Render dashboard
+        value: $DATABASE_URL
       - key: SECRET_KEY
-        value: YOUR_SECRET_KEY
+        # Use your secret named `SECRET_KEY` in Render dashboard
+        value: $SECRET_KEY
 
   - type: static
     name: mentor-platform-frontend
@@ -23,7 +25,8 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: REACT_APP_API_URL
-        value: https://your-backend.onrender.com
+        # Use your frontend env variable `REACT_APP_API_URL` (set to backend URL)
+        value: $REACT_APP_API_URL
 
 # Notes:
 # - Replace `YOUR_USERNAME`, `YOUR_DATABASE_URL`, and `YOUR_SECRET_KEY` with real values
