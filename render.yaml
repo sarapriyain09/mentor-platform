@@ -1,0 +1,30 @@
+# Render service descriptor (example). Replace placeholder values before deploying.
+
+services:
+  - type: web
+    name: mentor-platform-backend
+    env: python
+    repo: https://github.com/YOUR_USERNAME/mentor-platform
+    branch: master
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: YOUR_DATABASE_URL
+      - key: SECRET_KEY
+        value: YOUR_SECRET_KEY
+
+  - type: static
+    name: mentor-platform-frontend
+    env: static
+    repo: https://github.com/YOUR_USERNAME/mentor-platform
+    branch: master
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://your-backend.onrender.com
+
+# Notes:
+# - Replace `YOUR_USERNAME`, `YOUR_DATABASE_URL`, and `YOUR_SECRET_KEY` with real values
+# - Render UI will still prompt for confirmation of service settings (plans, regions, etc.)
