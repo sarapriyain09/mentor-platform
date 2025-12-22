@@ -1,0 +1,141 @@
+.requests-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.requests-page h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+}
+
+.requests-section {
+  margin-bottom: 3rem;
+}
+
+.requests-section h2 {
+  color: #34495e;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+}
+
+.no-data a {
+  color: #667eea;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.requests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.request-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.request-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.request-card h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.request-card p {
+  margin: 0.5rem 0;
+  color: #555;
+}
+
+.request-date {
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: 1rem;
+  border-top: 1px solid #ecf0f1;
+  padding-top: 0.75rem;
+}
+
+.status-pending {
+  color: #f39c12;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.status-accepted {
+  color: #27ae60;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.status-rejected {
+  color: #e74c3c;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.request-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-accept {
+  flex: 1;
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.btn-accept:hover {
+  background: #229954;
+}
+
+.btn-reject {
+  flex: 1;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.btn-reject:hover {
+  background: #c0392b;
+}
+
+.mentorship-card {
+  border-left: 4px solid #27ae60;
+}
+
+@media (max-width: 768px) {
+  .requests-grid {
+    grid-template-columns: 1fr;
+  }
+}

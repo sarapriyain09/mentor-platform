@@ -2,12 +2,19 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 
-# URL-encode special characters in the password
-# Original password: Raja@250709 -> Raja%40250709
-DATABASE_URL = "postgresql://postgres:Raja%40250709@localhost:5432/mentor_db"
+# Use environment variable for production, fallback to local for development
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres:Raja%40250709@localhost:5432/mentor_db"
+)
 
-# Create the engine without 'check_same_thread' (only for SQLite)
+# Render PostgreSQL URLs use postgres:// but SQLAlchemy requires postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Create the engine
 engine = create_engine(DATABASE_URL)
 
 # Create a configured "Session" class

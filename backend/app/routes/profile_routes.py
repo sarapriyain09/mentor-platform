@@ -3,9 +3,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.profile import MentorProfile, MenteeProfile
 from app.schemas.profile_schema import MentorProfileCreate, MentorProfileOut, MenteeProfileCreate, MenteeProfileOut
-from app.utils.auth_utils import get_current_user, get_password_hash
+from app.auth import get_current_user
 from app.models.user import User
-from app.schemas import UserCreate, UserOut
 
 router = APIRouter(
     prefix="/profiles",
@@ -17,42 +16,145 @@ router = APIRouter(
 # -------------------------
 @router.post("/mentor", response_model=MentorProfileOut)
 def create_mentor_profile(profile: MentorProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Role check
+    if current_user.role != "mentor":
+        raise HTTPException(status_code=403, detail="Only mentors can create mentor profiles")
+    
     db_profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
     if db_profile:
         raise HTTPException(status_code=400, detail="Mentor profile already exists")
-    new_profile = MentorProfile(user_id=current_user.id, **profile.dict())
+    
+    new_profile = MentorProfile(user_id=current_user.id, **profile.model_dump())
     db.add(new_profile)
     db.commit()
     db.refresh(new_profile)
     return new_profile
+
+
+# -------------------------
+# Update Mentor Profile
+# -------------------------
+@router.put("/mentor", response_model=MentorProfileOut)
+def update_mentor_profile(profile: MentorProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Role check
+    if current_user.role != "mentor":
+        raise HTTPException(status_code=403, detail="Only mentors can update mentor profiles")
+    
+    db_profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
+    if not db_profile:
+        raise HTTPException(status_code=404, detail="Mentor profile not found. Create one first.")
+    
+    # Update fields
+    for key, value in profile.model_dump().items():
+        setattr(db_profile, key, value)
+    
+    db.commit()
+    db.refresh(db_profile)
+    return db_profile
+
+
+# -------------------------
+# Delete Mentor Profile
+# -------------------------
+@router.delete("/mentor")
+def delete_mentor_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != "mentor":
+        raise HTTPException(status_code=403, detail="Only mentors can delete mentor profiles")
+    
+    db_profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
+    if not db_profile:
+        raise HTTPException(status_code=404, detail="Mentor profile not found")
+    
+    db.delete(db_profile)
+    db.commit()
+    return {"message": "Mentor profile deleted successfully"}
+
 
 # -------------------------
 # Create Mentee Profile
 # -------------------------
 @router.post("/mentee", response_model=MenteeProfileOut)
 def create_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Role check
+    if current_user.role != "mentee":
+        raise HTTPException(status_code=403, detail="Only mentees can create mentee profiles")
+    
     db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
     if db_profile:
         raise HTTPException(status_code=400, detail="Mentee profile already exists")
-    new_profile = MenteeProfile(user_id=current_user.id, **profile.dict())
+    
+    new_profile = MenteeProfile(user_id=current_user.id, **profile.model_dump())
     db.add(new_profile)
     db.commit()
     db.refresh(new_profile)
     return new_profile
 
-@router.post("/register", response_model=UserOut)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == user.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
 
-    db_user = User(
-        email=user.email,
-        hashed_password=get_password_hash(user.password),
-        role=user.role
-    )
-    db.add(db_user)
+# -------------------------
+# Update Mentee Profile
+# -------------------------
+@router.put("/mentee", response_model=MenteeProfileOut)
+def update_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Role check
+    if current_user.role != "mentee":
+        raise HTTPException(status_code=403, detail="Only mentees can update mentee profiles")
+    
+    db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
+    if not db_profile:
+        raise HTTPException(status_code=404, detail="Mentee profile not found. Create one first.")
+    
+    # Update fields
+    for key, value in profile.model_dump().items():
+        setattr(db_profile, key, value)
+    
     db.commit()
-    db.refresh(db_user)
+    db.refresh(db_profile)
+    return db_profile
 
-    return db_user  # ✅ THIS FIXES THE 500
+
+# -------------------------
+# Delete Mentee Profile
+# -------------------------
+@router.delete("/mentee")
+def delete_mentee_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != "mentee":
+        raise HTTPException(status_code=403, detail="Only mentees can delete mentee profiles")
+    
+    db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
+    if not db_profile:
+        raise HTTPException(status_code=404, detail="Mentee profile not found")
+    
+    db.delete(db_profile)
+    db.commit()
+    return {"message": "Mentee profile deleted successfully"}
+
+# -------------------------
+# Get Current User's Profile
+# -------------------------
+@router.get("/me")
+def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Get the current user's profile (mentor or mentee)"""
+    if current_user.role == "mentor":
+        profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
+        if not profile:
+            raise HTTPException(status_code=404, detail="Mentor profile not found. Create one first.")
+        return {"type": "mentor", "profile": profile}
+    
+    elif current_user.role == "mentee":
+        profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
+        if not profile:
+            raise HTTPException(status_code=404, detail="Mentee profile not found. Create one first.")
+        return {"type": "mentee", "profile": profile}
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid user role")
+
+
+# -------------------------
+# Get All Mentor Profiles (for search/listing)
+# -------------------------
+@router.get("/mentors", response_model=list[MentorProfileOut])
+def list_mentors(db: Session = Depends(get_db)):
+    """List all mentor profiles (public endpoint for mentee search)"""
+    mentors = db.query(MentorProfile).all()
+    return mentors

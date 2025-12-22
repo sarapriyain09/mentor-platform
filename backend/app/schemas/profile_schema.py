@@ -12,6 +12,7 @@ class MentorProfileCreate(BaseModel):
 
 class MentorProfileOut(MentorProfileCreate):
     id: int
+    user_id: int
     is_verified: bool
 
     class Config:
@@ -26,6 +27,7 @@ class MenteeProfileCreate(BaseModel):
 
 class MenteeProfileOut(MenteeProfileCreate):
     id: int
+    user_id: int
 
     class Config:
         from_attributes = True
