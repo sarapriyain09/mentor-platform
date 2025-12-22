@@ -1,36 +1,69 @@
 # app/main.py
-
 from fastapi import FastAPI
-from app.database import engine
-from app import models
-
+from app.database import Base, engine, SessionLocal
 from app.routes.auth_routes import router as auth_router
 from app.routes.profile_routes import router as profile_router
-from app.routes.session_routes import router as session_router
+from app.routes.demo_routes import router as demo_router
+import app.models.note  # ensure Note model is registered with Base
+from fastapi.middleware.cors import CORSMiddleware
 
-# ======================
-# CREATE DATABASE TABLES
-# ======================
-models.Base.metadata.create_all(bind=engine)
+# -------------------------
+# Create FastAPI instance
+# -------------------------
+app = FastAPI(title="Mentoralab API")
 
-# ======================
-# FASTAPI APP
-# ======================
-app = FastAPI(
-    title="Mentorship Platform API",
-    version="2.0"
+# -------------------------
+# CORS Middleware
+# -------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://your-react-app.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# ======================
-# ROUTES
-# ======================
-app.include_router(auth_router)
+# -------------------------
+# Include Routers
+# -------------------------
+app.include_router(auth_router, prefix="/auth", tags=["auth"])  # only once
 app.include_router(profile_router)
-app.include_router(session_router)
+app.include_router(demo_router)
 
-# ======================
-# HEALTH CHECK
-# ======================
+# -------------------------
+# Root & Demo API
+# -------------------------
 @app.get("/")
-def root():
-    return {"status": "Mentorship Platform API running"}
+def read_root():
+    return {"status": "FastAPI running"}
+
+@app.get("/api/tasks")
+def get_tasks():
+    return [{"id": 1, "title": "Learn FastAPI"}, {"id": 2, "title": "Deploy React"}]
+
+# -------------------------
+# Create all tables
+# -------------------------
+Base.metadata.create_all(bind=engine)
+
+# -------------------------
+# Seed demo note
+# -------------------------
+def _seed_demo_note():
+    db = SessionLocal()
+    try:
+        from app.models.note import Note
+        exists = db.query(Note).first()
+        if not exists:
+            demo = Note(title="Welcome", content="This is a seeded demo note.")
+            db.add(demo)
+            db.commit()
+    finally:
+        db.close()
+
+_seed_demo_note()
+

@@ -1,20 +1,19 @@
 # app/database.py
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-import os
-from dotenv import load_dotenv
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-load_dotenv()  # Load .env file
+# URL-encode special characters in the password
+# Original password: Raja@250709 -> Raja%40250709
+DATABASE_URL = "postgresql://postgres:Raja%40250709@localhost:5432/mentor_db"
 
-DATABASE_URL = os.getenv("DATABASE_URL")  # e.g., postgresql://postgres:password@localhost:5432/mentorship
-
-# Create engine
+# Create the engine without 'check_same_thread' (only for SQLite)
 engine = create_engine(DATABASE_URL)
 
-# Session
+# Create a configured "Session" class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for models
+# Base class for our models
 Base = declarative_base()
 
 # Dependency to get DB session
