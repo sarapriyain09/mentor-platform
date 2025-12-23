@@ -1,0 +1,10 @@
+backend/
+backend_old/
+*.pyc
+__pycache__/
+*.py
+requirements.txt
+.venv/
+venv/
+*.db
+*.sqlite
