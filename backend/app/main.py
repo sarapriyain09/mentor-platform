@@ -5,10 +5,14 @@ from app.routes.auth_routes import router as auth_router
 from app.routes.profile_routes import router as profile_router
 from app.routes.demo_routes import router as demo_router
 from app.routes.mentorship_routes import router as mentorship_router
-import app.models.note  # ensure Note model is registered with Base
+from app.routes.ai_agent_routes import router as ai_agent_router
+from app.routes.booking_routes import router as booking_router  # NEW
+import app.models.note
 import app.models.user
 import app.models.profile
 import app.models.mentorship
+import app.models.mentee_intake
+import app.models.booking  # NEW
 from fastapi.middleware.cors import CORSMiddleware
 
 # -------------------------
@@ -38,6 +42,8 @@ app.include_router(mentorship_router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])  # only once
 app.include_router(profile_router)
 app.include_router(demo_router)
+app.include_router(ai_agent_router)
+app.include_router(booking_router)  # NEW
 
 # -------------------------
 # Root & Demo API

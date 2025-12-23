@@ -19,7 +19,22 @@ export default function Navbar({ user, setUser }) {
       {user ? (
         <div className="nav-links">
           <Link to="/dashboard">Dashboard</Link>
+          {user.role === 'mentee' && (
+            <Link 
+              to="/ai-match"
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                padding: '0.5rem 1rem',
+                borderRadius: '20px',
+                fontWeight: '600'
+              }}
+            >
+              🤖 AI Match
+            </Link>
+          )}
           <Link to="/mentors">Find Mentors</Link>
+          <Link to="/bookings">📅 Bookings</Link>
           <Link to="/requests">My Requests</Link>
           {user.role === 'mentor' && <Link to="/profile/mentor">My Profile</Link>}
           {user.role === 'mentee' && <Link to="/profile/mentee">My Profile</Link>}

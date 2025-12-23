@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';  // NEW
 import './MentorList.css';
 
 export default function MentorList() {
@@ -6,6 +7,7 @@ export default function MentorList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();  // NEW
 
   useEffect(() => {
     fetchMentors();
@@ -56,6 +58,11 @@ export default function MentorList() {
     }
   };
 
+  // NEW: Navigate to booking page
+  const bookSession = (mentorId) => {
+    navigate(`/book-mentor/${mentorId}`);
+  };
+
   const filteredMentors = mentors.filter(mentor =>
     mentor.full_name?.toLowerCase().includes(filter.toLowerCase()) ||
     mentor.skills?.toLowerCase().includes(filter.toLowerCase()) ||
@@ -95,19 +102,28 @@ export default function MentorList() {
                 <p><strong>Skills:</strong> {mentor.skills}</p>
                 <p><strong>Experience:</strong> {mentor.years_experience} years</p>
                 <p><strong>Availability:</strong> {mentor.availability}</p>
-                <p><strong>Rate:</strong> ${mentor.hourly_rate}/hour</p>
+                <p><strong>Rate:</strong> £{mentor.hourly_rate}/hour</p>
               </div>
               
               <div className="mentor-bio">
                 <p>{mentor.bio}</p>
               </div>
               
-              <button 
-                className="btn-connect"
-                onClick={() => requestMentorship(mentor.user_id, mentor.full_name)}
-              >
-                Request Mentorship
-              </button>
+              {/* NEW: Action buttons */}
+              <div className="mentor-actions">
+                <button 
+                  className="btn-book-session"
+                  onClick={() => bookSession(mentor.user_id)}
+                >
+                  📅 Book Session
+                </button>
+                <button 
+                  className="btn-connect"
+                  onClick={() => requestMentorship(mentor.user_id, mentor.full_name)}
+                >
+                  Request Mentorship
+                </button>
+              </div>
             </div>
           ))
         )}

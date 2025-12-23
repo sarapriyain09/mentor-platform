@@ -7,6 +7,9 @@ import MentorProfile from './pages/MentorProfile';
 import MenteeProfile from './pages/MenteeProfile';
 import MentorList from './pages/MentorList';
 import Requests from './pages/Requests';
+import AIIntakeFlow from './pages/AIIntakeFlow';
+import Bookings from './pages/Bookings';
+import BookMentor from './pages/BookMentor';
 import Navbar from './components/Navbar';
 import './App.css';
 
@@ -55,9 +58,24 @@ export default function App() {
                 <MentorList />
               </ProtectedRoute>
             } />
+            <Route path="/ai-match" element={
+              <ProtectedRoute>
+                <AIIntakeFlow />
+              </ProtectedRoute>
+            } />
             <Route path="/requests" element={
               <ProtectedRoute>
                 <Requests />
+              </ProtectedRoute>
+            } />
+            <Route path="/bookings" element={
+              <ProtectedRoute>
+                <Bookings />
+              </ProtectedRoute>
+            } />
+            <Route path="/book-mentor/:mentorId" element={
+              <ProtectedRoute>
+                <BookMentor />
               </ProtectedRoute>
             } />
           </Routes>

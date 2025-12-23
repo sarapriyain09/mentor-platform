@@ -19,6 +19,19 @@ body {
 
 .container {
   flex: 1;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* Add padding to individual pages */
+.dashboard,
+.profile-page,
+.mentor-list-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 button {

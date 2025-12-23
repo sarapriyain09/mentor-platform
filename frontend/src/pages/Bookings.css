@@ -1,0 +1,215 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import BookingCalendar from '../components/BookingCalendar';
+import './BookMentor.css';
+
+export default function BookMentor() {
+  const { mentorId } = useParams();
+  const navigate = useNavigate();
+  const [mentor, setMentor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchMentorDetails();
+  }, [mentorId]);
+
+  const fetchMentorDetails = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8000/profiles/mentor/${mentorId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMentor(data);
+      } else {
+        setError('Mentor not found');
+      }
+    } catch (err) {
+      setError('Error loading mentor details');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBookingCreated = () => {
+    navigate('/bookings');
+  };
+
+  if (loading) {
+    return (
+      <div className="book-mentor-page">
+        <div className="loading">Loading mentor details...</div>
+      </div>
+    );
+  }
+
+  if (error || !mentor) {
+    return (
+      <div className="book-mentor-page">
+        <div className="error-container">
+          <h2>Error</h2>
+          <p>{error || 'Mentor not found'}</p>
+          <button onClick={() => navigate('/mentors')} className="btn-back">
+            Back to Mentors
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="book-mentor-page">
+      <div className="mentor-info-banner">
+        <button onClick={() => navigate('/mentors')} className="btn-back-small">
+          ← Back to Mentors
+        </button>
+        <div className="mentor-summary">
+          <h1>{mentor.full_name}</h1>
+          <div className="mentor-meta">
+            <span className="domain">🎯 {mentor.domain}</span>
+            <span className="experience">💼 {mentor.years_of_experience} years</span>
+            <span className="rate">💰 £{mentor.hourly_rate}/hour</span>
+          </div>
+          <p className="bio">{mentor.bio}</p>
+        </div>
+      </div>
+
+      <BookingCalendar
+        mentorId={parseInt(mentorId)}
+        mentorName={mentor.full_name}
+        hourlyRate={mentor.hourly_rate}
+        onBookingCreated={handleBookingCreated}
+      />
+    </div>
+  );
+}
+
+.book-mentor-page {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 2rem 0;
+}
+
+.mentor-info-banner {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-back-small {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.btn-back-small:hover {
+  color: #2980b9;
+}
+
+.mentor-summary h1 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.mentor-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.mentor-meta span {
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.domain {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.experience {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.rate {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.bio {
+  color: #34495e;
+  line-height: 1.6;
+  margin: 1rem 0 0 0;
+}
+
+.loading,
+.error-container {
+  max-width: 600px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.error-container h2 {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.error-container p {
+  color: #7f8c8d;
+  margin-bottom: 2rem;
+}
+
+.btn-back {
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-back:hover {
+  background: #2980b9;
+}
+
+@media (max-width: 768px) {
+  .book-mentor-page {
+    padding: 1rem 0;
+  }
+
+  .mentor-info-banner {
+    margin: 0 1rem 1rem;
+    padding: 1.5rem;
+  }
+
+  .mentor-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
