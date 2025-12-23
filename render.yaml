@@ -7,7 +7,7 @@ services:
     repo: https://github.com/sarapriyain09/mentor-platform
     branch: master
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
         # Use your secret named `DATABASE_URL` in Render dashboard
