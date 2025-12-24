@@ -21,21 +21,12 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="Mentoralab API")
 
 # -------------------------
-# CORS Middleware
+# CORS Middleware - Allow all Vercel deployments
 # -------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel deployments
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Add localhost separately since regex doesn't support OR with different schemes
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
-    allow_credentials=True,
+    allow_origins=["*"],  # Temporarily allow all for testing
+    allow_credentials=False,  # Must be False with "*"
     allow_methods=["*"],
     allow_headers=["*"],
 )
