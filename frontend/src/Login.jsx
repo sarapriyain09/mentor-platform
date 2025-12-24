@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "./api";
 import './Auth.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 export default function Login({ setUser }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -18,7 +20,7 @@ export default function Login({ setUser }) {
         // Decode JWT to get role (simple base64 decode)
         const payload = JSON.parse(atob(res.access_token.split('.')[1]));
         // Fetch user details to get role
-        const userRes = await fetch('http://127.0.0.1:8000/auth/users', {
+        const userRes = await fetch(`${API_BASE}/auth/users`, {
           headers: { 'Authorization': `Bearer ${res.access_token}` }
         });
         const users = await userRes.json();
