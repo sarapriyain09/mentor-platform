@@ -93,7 +93,7 @@ export default function AvailabilityManager() {
         await fetchAvailability();
         setShowAddSlot(false);
         setNewSlot({ day_of_week: 1, start_time: '09:00', end_time: '10:00' });
-        alert('Availability slot added successfully!');
+        window.__toast?.add?.('Availability slot added successfully!', 'success');
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Failed to add slot');
@@ -140,7 +140,7 @@ export default function AvailabilityManager() {
 
       if (response.ok) {
         await fetchAvailability();
-        alert('Slot deleted successfully');
+        window.__toast?.add?.('Slot deleted successfully', 'success');
       }
     } catch (err) {
       console.error('Error deleting slot:', err);
@@ -167,7 +167,7 @@ export default function AvailabilityManager() {
         await fetchBlockedDates();
         setShowBlockDate(false);
         setBlockDateForm({ blocked_date: '', reason: '' });
-        alert('Date blocked successfully!');
+        window.__toast?.add?.('Date blocked successfully!', 'success');
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Failed to block date');
@@ -194,7 +194,7 @@ export default function AvailabilityManager() {
 
       if (response.ok) {
         await fetchBlockedDates();
-        alert('Date unblocked successfully');
+        window.__toast?.add?.('Date unblocked successfully', 'success');
       }
     } catch (err) {
       console.error('Error unblocking date:', err);

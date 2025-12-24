@@ -51,10 +51,10 @@ export default function MentorList() {
         setTimeout(() => setMessage(''), 3000);
       } else {
         const error = await res.json();
-        alert(error.detail || 'Failed to send request');
+        window.__toast?.add?.(error.detail || 'Failed to send request', 'error');
       }
     } catch (err) {
-      alert('Failed to send request');
+      window.__toast?.add?.('Failed to send request', 'error');
     }
   };
 

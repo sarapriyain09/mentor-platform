@@ -7,7 +7,7 @@ import os
 # Use environment variable for production, fallback to local for development
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:Raja%40250709@localhost:5432/mentor_db"
+    "postgresql://postgres:postgres123@localhost:5432/mentor_db"
 )
 
 # Render PostgreSQL URLs use postgres:// but SQLAlchemy requires postgresql://

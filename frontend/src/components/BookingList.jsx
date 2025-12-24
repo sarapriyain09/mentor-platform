@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import StripePayment from './StripePayment';
 import { useNavigate } from 'react-router-dom';
 import './BookingList.css';
 
@@ -7,6 +10,10 @@ export default function BookingList() {
   const [filter, setFilter] = useState('all'); // all, requested, confirmed, completed, cancelled
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentClientSecret, setPaymentClientSecret] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
+  const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '');
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role');
 
@@ -57,14 +64,15 @@ export default function BookingList() {
       });
 
       if (response.ok) {
-        alert(`Booking ${newStatus} successfully!`);
+        // show toast success
+        window.__toast?.add?.(`Booking ${newStatus} successfully!`, 'success');
         fetchBookings(); // Refresh list
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.detail}`);
+        window.__toast?.add?.(`Error: ${errorData.detail}`, 'error');
       }
     } catch (err) {
-      alert('Error updating booking status');
+      window.__toast?.add?.('Error updating booking status', 'error');
       console.error(err);
     }
   };
@@ -119,6 +127,57 @@ export default function BookingList() {
       refunded: { class: 'payment-refunded', text: '↩ Refunded' }
     };
     return badges[paymentStatus] || { class: '', text: paymentStatus };
+  };
+
+  // Payment retry handlers
+  const handleRetryPayment = async (booking) => {
+    setError('');
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const resp = await fetch('http://localhost:8000/payments/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ booking_id: booking.id, amount: booking.amount })
+      });
+
+        if (!resp.ok) {
+        const err = await resp.json();
+        window.__toast?.add?.(err.detail || 'Could not initialize payment', 'error');
+      } else {
+        const data = await resp.json();
+        setPaymentClientSecret(data.client_secret);
+        setPaymentId(data.payment_id);
+        setShowPayment(true);
+      }
+    } catch (e) {
+      console.error(e);
+      window.__toast?.add?.('Error starting payment', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = async (paymentIntent) => {
+    try {
+      const token = localStorage.getItem('token');
+      await fetch('http://localhost:8000/payments/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ payment_id: paymentId, payment_intent_id: paymentIntent.id })
+      });
+      setShowPayment(false);
+      window.__toast?.add?.('Payment successful — booking confirmed.', 'success');
+      fetchBookings();
+    } catch (e) {
+      console.error(e);
+      window.__toast?.add?.('Payment succeeded but confirmation failed. Please contact support.', 'error');
+    }
+  };
+
+  const handlePaymentCancel = () => {
+    setShowPayment(false);
+    window.__toast?.add?.('Payment cancelled. You can complete payment later from this bookings page.', 'info');
   };
 
   if (loading) {
@@ -251,6 +310,19 @@ export default function BookingList() {
                   <div className="cancellation-reason">
                     <strong>Cancellation reason:</strong>
                     <p>{booking.cancellation_reason}</p>
+                  </div>
+                )}
+
+                {/* Retry payment action for mentees when payment is pending */}
+                {!isMentor && booking.payment_status === 'pending' && (
+                  <div className="retry-payment">
+                    <button
+                      className="btn-retry-payment"
+                      onClick={() => handleRetryPayment(booking)}
+                    >
+                      ⚡ Retry Payment
+                    </button>
+                    <small className="retry-note">If your previous payment failed, retry here.</small>
                   </div>
                 )}
 

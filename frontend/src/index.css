@@ -65,3 +65,27 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Toast styles */
+.toasts-container {
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 9999;
+}
+.toast {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.toast-info { background: #2d9cdb; }
+.toast-success { background: #27ae60; }
+.toast-error { background: #e74c3c; }
+.toast-close { background: transparent; border: none; color: rgba(255,255,255,0.9); cursor: pointer; margin-left: auto; font-weight: 700; }

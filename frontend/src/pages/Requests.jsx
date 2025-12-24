@@ -66,7 +66,7 @@ export default function Requests() {
         fetchData();
       }
     } catch (err) {
-      alert('Failed to accept request');
+      window.__toast?.add?.('Failed to accept request', 'error');
     }
   };
 
@@ -84,7 +84,7 @@ export default function Requests() {
         fetchData();
       }
     } catch (err) {
-      alert('Failed to reject request');
+      window.__toast?.add?.('Failed to reject request', 'error');
     }
   };
 
@@ -104,7 +104,7 @@ export default function Requests() {
         fetchData();
       }
     } catch (err) {
-      alert('Failed to complete mentorship');
+      window.__toast?.add?.('Failed to complete mentorship', 'error');
     }
   };
 

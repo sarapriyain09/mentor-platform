@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import './BookingCalendar.css';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import StripePayment from './StripePayment';
 
 export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBookingCreated }) {
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -9,6 +12,11 @@ export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBo
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentClientSecret, setPaymentClientSecret] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
+
+  const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '');
 
   // Generate date range (next 14 days)
   const getDateRange = () => {
@@ -111,9 +119,24 @@ export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBo
 
       if (response.ok) {
         const booking = await response.json();
-        alert('Booking request sent successfully! Waiting for mentor confirmation.');
-        if (onBookingCreated) {
-          onBookingCreated(booking);
+        // Booking created; create PaymentIntent for immediate payment
+        // Booking.amount is expected from backend
+        const amount = booking.amount || (hourlyRate * (duration / 60));
+        const payResp = await fetch('http://localhost:8000/payments/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ booking_id: booking.id, amount })
+        });
+
+        if (payResp.ok) {
+          const payData = await payResp.json();
+          setPaymentClientSecret(payData.client_secret);
+          setPaymentId(payData.payment_id);
+          setShowPayment(true);
+        } else {
+          // fallback: notify and continue
+          window.__toast?.add?.('Booking created. Payment could not be initialized.', 'error');
+          if (onBookingCreated) onBookingCreated(booking);
         }
         // Reset form
         setSelectedDate(null);
@@ -130,6 +153,25 @@ export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBo
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentSuccess = async (paymentIntent) => {
+    // call backend confirm endpoint to finalize
+    const token = localStorage.getItem('token');
+    await fetch('http://localhost:8000/payments/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ payment_id: paymentId, payment_intent_id: paymentIntent.id })
+    });
+
+    setShowPayment(false);
+    window.__toast?.add?.('Payment successful — booking confirmed.', 'success');
+    if (onBookingCreated) onBookingCreated();
+  };
+
+  const handlePaymentCancel = () => {
+    setShowPayment(false);
+    window.__toast?.add?.('Payment cancelled. You can complete payment later on your bookings page.', 'info');
   };
 
   const formatDate = (date) => {
@@ -272,6 +314,12 @@ export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBo
           <div className="spinner"></div>
           <p>Loading availability...</p>
         </div>
+      )}
+
+      {showPayment && paymentClientSecret && (
+        <Elements stripe={stripePromise} options={{ clientSecret: paymentClientSecret }}>
+          <StripePayment clientSecret={paymentClientSecret} onSuccess={handlePaymentSuccess} onCancel={handlePaymentCancel} />
+        </Elements>
       )}
     </div>
   );

@@ -5,6 +5,7 @@ import './Auth.css';
 
 export default function Register() {
   const [form, setForm] = useState({
+    full_name: "",
     email: "",
     password: "",
     role: "mentee",
@@ -39,6 +40,13 @@ export default function Register() {
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
         <form onSubmit={submit}>
+          <input 
+            placeholder="Full name"
+            type="text"
+            required
+            value={form.full_name}
+            onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+          />
           <input 
             placeholder="Email"
             type="email"
