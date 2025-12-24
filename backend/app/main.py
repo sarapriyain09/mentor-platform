@@ -27,6 +27,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://mentor-platform-6mzqnjg28-saravanan-rajagopalans-projects.vercel.app",
+        "https://mentor-platform-dxpb-d1jl1lg0m-saravanan-rajagopalans-projects.vercel.app",
         "https://mentor-platform-saravanan-rajagopalans-projects.vercel.app",
         "https://mentor-platform.vercel.app",
         "http://localhost:5173",

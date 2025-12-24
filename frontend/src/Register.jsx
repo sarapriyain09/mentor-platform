@@ -19,13 +19,15 @@ export default function Register() {
     setSuccess("");
     try {
       const res = await registerUser(form);
+      console.log("Registration response:", res); // Debug log
       if (res.id) {
         setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
       } else {
-        setError(res.detail || "Registration failed");
+        setError(res.detail || res.message || "Registration failed");
       }
     } catch (err) {
+      console.error("Registration error:", err); // Debug log
       setError("Registration failed. Please try again.");
     }
   };
