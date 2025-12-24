@@ -31,14 +31,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Also allow localhost for development
-from fastapi.middleware.cors import CORSMiddleware as ExtraCORS
+# Add localhost separately since regex doesn't support OR with different schemes
 app.add_middleware(
-    ExtraCORS,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000"
-    ],
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
