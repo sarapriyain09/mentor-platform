@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class UserCreate(BaseModel):
     email: str
     password: str
+    full_name: str
     role: str  # mentee or mentor
 
 class UserLogin(BaseModel):

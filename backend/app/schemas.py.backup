@@ -18,7 +18,7 @@ class UserResponse(BaseModel):
     role: str
 
     class Config:
-        from_attributes = True
+        from_attributes = True  # important for SQLAlchemy objects
 
 class Token(BaseModel):
     access_token: str

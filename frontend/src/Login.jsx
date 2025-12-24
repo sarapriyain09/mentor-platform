@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "./api";
 import './Auth.css';
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8001";
 
 export default function Login({ setUser }) {
   const [form, setForm] = useState({ email: "", password: "" });

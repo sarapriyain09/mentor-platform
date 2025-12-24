@@ -7,7 +7,8 @@ export default function Register() {
   const [form, setForm] = useState({
     email: "",
     password: "",
-    role: "mentee",
+    full_name: "",
+    role: "MENTEE",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -47,6 +48,13 @@ export default function Register() {
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <input 
+            placeholder="Full Name"
+            type="text"
+            required
+            value={form.full_name}
+            onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+          />
+          <input 
             placeholder="Password" 
             type="password"
             required
@@ -57,8 +65,8 @@ export default function Register() {
             value={form.role}
             onChange={(e) => setForm({ ...form, role: e.target.value })}
           >
-            <option value="mentee">I'm looking for a mentor (Mentee)</option>
-            <option value="mentor">I want to be a mentor (Mentor)</option>
+            <option value="MENTEE">I'm looking for a mentor (Mentee)</option>
+            <option value="MENTOR">I want to be a mentor (Mentor)</option>
           </select>
           <button type="submit" className="btn-primary">Register</button>
         </form>

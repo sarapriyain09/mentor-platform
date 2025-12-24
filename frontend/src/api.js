@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8001";
 console.log("API_BASE is:", API_BASE); // Debug log
 
 export async function registerUser(data) {

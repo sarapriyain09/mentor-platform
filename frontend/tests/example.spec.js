@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-test('homepage shows title and demo notes', async ({ page }) => {
-  await page.goto(process.env.FRONTEND_TEST_URL || 'http://localhost:4173');
-  await expect(page.locator('h1')).toHaveText('Mentor Platform');
-  // if demo notes are present, ensure list renders
-  const list = page.locator('ul');
-  if (await list.count() > 0) {
-    await expect(list).toBeVisible();
-  }
+test('homepage redirects to dashboard or login', async ({ page }) => {
+  await page.goto(process.env.FRONTEND_TEST_URL || 'http://localhost:5173');
+  
+  // Should redirect to either login or dashboard
+  await page.waitForURL(/\/(login|dashboard)/, { timeout: 5000 });
+  
+  // Verify page title
+  await expect(page).toHaveTitle('Mentor Platform');
 });
