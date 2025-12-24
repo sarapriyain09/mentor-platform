@@ -7,12 +7,14 @@ from app.routes.demo_routes import router as demo_router
 from app.routes.mentorship_routes import router as mentorship_router
 from app.routes.ai_agent_routes import router as ai_agent_router
 from app.routes.booking_routes import router as booking_router  # NEW
+from app.routes.payment_routes import router as payment_router  # NEW
 import app.models.note
 import app.models.user
 import app.models.profile
 import app.models.mentorship
 import app.models.mentee_intake
 import app.models.booking  # NEW
+import app.models.payment  # NEW
 from fastapi.middleware.cors import CORSMiddleware
 
 # -------------------------
@@ -40,6 +42,7 @@ app.include_router(profile_router)
 app.include_router(demo_router)
 app.include_router(ai_agent_router)
 app.include_router(booking_router)  # NEW
+app.include_router(payment_router)  # NEW
 
 # -------------------------
 # Root & Demo API
