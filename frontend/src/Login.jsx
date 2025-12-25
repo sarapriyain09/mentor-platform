@@ -13,10 +13,12 @@ export default function Login({ setUser }) {
     setError("");
     try {
       const res = await loginUser(form);
-      if (res.access_token && res.role) {
+      if (res.access_token) {
         localStorage.setItem("token", res.access_token);
-        localStorage.setItem("role", res.role);
-        setUser({ role: res.role });
+        if (res.role) {
+          localStorage.setItem("role", res.role);
+          setUser({ role: res.role });
+        }
         navigate("/dashboard");
       } else {
         setError(res.detail || "Login failed");
