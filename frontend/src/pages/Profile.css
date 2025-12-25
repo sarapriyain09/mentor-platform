@@ -38,6 +38,11 @@
   font-family: inherit;
 }
 
+.bio-textarea {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
@@ -61,6 +66,27 @@
   margin-top: 0.4rem;
   font-size: 0.9rem;
   color: #666;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.skill-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #ecf0f1;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #555;
+  font-size: 0.85rem;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-danger {

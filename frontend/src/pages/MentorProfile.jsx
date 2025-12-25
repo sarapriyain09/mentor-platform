@@ -29,6 +29,13 @@ function countWords(text) {
   return String(text || '').trim().split(/\s+/).filter(Boolean).length;
 }
 
+function splitList(value) {
+  return String(value || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export default function MentorProfile() {
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
@@ -58,7 +65,10 @@ export default function MentorProfile() {
         const data = await res.json();
         if (data.profile) {
           setProfile(data.profile);
-          setForm(data.profile);
+          setForm({
+            ...data.profile,
+            bio: clampWords(data.profile.bio, MAX_BIO_WORDS),
+          });
         }
       }
     } catch (err) {
@@ -72,6 +82,11 @@ export default function MentorProfile() {
     e.preventDefault();
     const token = localStorage.getItem('token');
     const method = profile ? 'PUT' : 'POST';
+
+    const payload = {
+      ...form,
+      bio: clampWords(form.bio, MAX_BIO_WORDS),
+    };
     
     try {
       const res = await fetch(`${API_BASE}/profiles/mentor`, {
@@ -80,7 +95,7 @@ export default function MentorProfile() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify(payload)
       });
       
       if (res.ok) {
@@ -157,6 +172,13 @@ export default function MentorProfile() {
             onChange={(e) => setForm({ ...form, skills: e.target.value })}
           />
           <div className="help-text">Use comma-separated skills.</div>
+          {splitList(form.skills).length > 0 && (
+            <div className="skill-tags" aria-label="skills preview">
+              {splitList(form.skills).map((skill) => (
+                <span key={skill} className="skill-tag" title={skill}>{skill}</span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="form-row">
@@ -199,6 +221,7 @@ export default function MentorProfile() {
           <textarea
             required
             rows="5"
+            className="bio-textarea"
             placeholder="Tell us about yourself and your mentoring experience..."
             value={form.bio}
             onChange={(e) => {
