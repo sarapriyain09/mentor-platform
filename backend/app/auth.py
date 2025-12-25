@@ -9,7 +9,28 @@ from app.models.user import User
 from app.database import get_db
 import os
 
+
+def _ensure_bcrypt_about() -> None:
+    """Compatibility shim for passlib with bcrypt>=4.
+
+    passlib 1.7.x tries to read `bcrypt.__about__.__version__`, but bcrypt>=4 removed
+    the `__about__` module. Creating it prevents noisy (but trapped) warnings.
+    """
+    try:
+        import bcrypt as _bcrypt  # type: ignore
+
+        if not hasattr(_bcrypt, "__about__"):
+            class _About:
+                __version__ = getattr(_bcrypt, "__version__", "unknown")
+
+            _bcrypt.__about__ = _About()  # type: ignore[attr-defined]
+    except Exception:
+        # If bcrypt isn't installed or something unexpected happens, passlib will
+        # fall back to its normal behavior.
+        return
+
 # Password hashing
+_ensure_bcrypt_about()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
