@@ -5,7 +5,7 @@ from datetime import datetime
 from app.database import get_db
 from app.models.user import User
 from app.schemas import UserCreate, UserResponse, UserLogin, Token, ForgotPasswordRequest, ResetPasswordRequest, MessageResponse
-from app.auth import hash_password, verify_password, create_access_token
+from app.auth import hash_password, verify_password, create_access_token, get_current_user
 from app.utils.email_service import send_welcome_email, send_password_reset_email, generate_reset_token, get_reset_token_expiry
 
 router = APIRouter(tags=["auth"])
