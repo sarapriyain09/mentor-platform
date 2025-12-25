@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE } from '../api';
 import './MentorList.css';
 
+function splitList(value) {
+  return String(value || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export default function MentorList() {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +107,14 @@ export default function MentorList() {
               
               <div className="mentor-info">
                 <p><strong>Domains:</strong> {mentor.domains}</p>
-                <p><strong>Skills:</strong> {mentor.skills}</p>
+                <div className="mentor-skills">
+                  <strong>Skills:</strong>
+                  <div className="skill-tags">
+                    {splitList(mentor.skills).map((skill) => (
+                      <span key={skill} className="skill-tag" title={skill}>{skill}</span>
+                    ))}
+                  </div>
+                </div>
                 <p><strong>Experience:</strong> {mentor.years_experience} years</p>
                 <p><strong>Availability:</strong> {mentor.availability}</p>
                 <p><strong>Rate:</strong> £{mentor.hourly_rate}/hour</p>

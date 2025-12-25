@@ -3,6 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE } from '../api';
 import './Profile.css';
 
+const DOMAIN_OPTIONS = [
+  'Engineering',
+  'Technology',
+  'Business',
+  'Design',
+  'Leadership',
+  'Career',
+  'Data',
+  'Marketing',
+  'Finance',
+  'Product',
+  'Other'
+];
+
+const MAX_BIO_WORDS = 120;
+
+function clampWords(text, maxWords) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return String(text || '');
+  return words.slice(0, maxWords).join(' ');
+}
+
+function countWords(text) {
+  return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
 export default function MentorProfile() {
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
@@ -109,13 +135,16 @@ export default function MentorProfile() {
 
         <div className="form-group">
           <label>Domains *</label>
-          <input
-            type="text"
+          <select
             required
-            placeholder="e.g., Tech, Business, Design"
             value={form.domains}
             onChange={(e) => setForm({ ...form, domains: e.target.value })}
-          />
+          >
+            <option value="" disabled>Select a domain</option>
+            {DOMAIN_OPTIONS.map((domain) => (
+              <option key={domain} value={domain}>{domain}</option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">
@@ -127,6 +156,7 @@ export default function MentorProfile() {
             value={form.skills}
             onChange={(e) => setForm({ ...form, skills: e.target.value })}
           />
+          <div className="help-text">Use comma-separated skills.</div>
         </div>
 
         <div className="form-row">
@@ -171,8 +201,14 @@ export default function MentorProfile() {
             rows="5"
             placeholder="Tell us about yourself and your mentoring experience..."
             value={form.bio}
-            onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            onChange={(e) => {
+              const next = clampWords(e.target.value, MAX_BIO_WORDS);
+              setForm({ ...form, bio: next });
+            }}
           />
+          <div className="help-text">
+            {countWords(form.bio)} / {MAX_BIO_WORDS} words
+          </div>
         </div>
 
         <div className="form-actions">

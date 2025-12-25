@@ -85,12 +85,41 @@
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 6px;
+  max-height: 140px;
+  overflow-y: auto;
 }
 
 .mentor-bio p {
   color: #666;
   margin: 0;
   line-height: 1.6;
+}
+
+.mentor-skills {
+  margin: 0.5rem 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.skill-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #ecf0f1;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #555;
+  font-size: 0.85rem;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-connect {

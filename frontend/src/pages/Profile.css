@@ -57,6 +57,12 @@
   margin-top: 2rem;
 }
 
+.help-text {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
 .btn-danger {
   background: #e74c3c;
   color: white;
