@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { API_BASE } from '../api';
 import './Dashboard.css';
 
 export default function Dashboard({ user }) {
@@ -14,7 +15,7 @@ export default function Dashboard({ user }) {
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/me', {
+      const res = await fetch(`${API_BASE}/profiles/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {

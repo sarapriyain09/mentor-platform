@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api';
 import './Requests.css';
 
 export default function Requests() {
@@ -20,7 +21,7 @@ export default function Requests() {
     
     try {
       if (role === 'mentee') {
-        const sentRes = await fetch('http://127.0.0.1:8000/mentorship/requests/sent', {
+        const sentRes = await fetch(`${API_BASE}/mentorship/requests/sent`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (sentRes.ok) {
@@ -28,7 +29,7 @@ export default function Requests() {
           setSentRequests(data);
         }
       } else if (role === 'mentor') {
-        const receivedRes = await fetch('http://127.0.0.1:8000/mentorship/requests/received', {
+        const receivedRes = await fetch(`${API_BASE}/mentorship/requests/received`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (receivedRes.ok) {
@@ -38,7 +39,7 @@ export default function Requests() {
       }
 
       // Fetch active mentorships for both
-      const mentorshipsRes = await fetch('http://127.0.0.1:8000/mentorship/active', {
+      const mentorshipsRes = await fetch(`${API_BASE}/mentorship/active`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (mentorshipsRes.ok) {
@@ -55,7 +56,7 @@ export default function Requests() {
   const acceptRequest = async (requestId) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://127.0.0.1:8000/mentorship/requests/${requestId}/accept`, {
+      const res = await fetch(`${API_BASE}/mentorship/requests/${requestId}/accept`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -73,7 +74,7 @@ export default function Requests() {
   const rejectRequest = async (requestId) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://127.0.0.1:8000/mentorship/requests/${requestId}/reject`, {
+      const res = await fetch(`${API_BASE}/mentorship/requests/${requestId}/reject`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -93,7 +94,7 @@ export default function Requests() {
     
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://127.0.0.1:8000/mentorship/mentorships/${mentorshipId}/complete`, {
+      const res = await fetch(`${API_BASE}/mentorship/mentorships/${mentorshipId}/complete`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });

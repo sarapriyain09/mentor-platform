@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api';
 import './BookingList.css';
 
 export default function BookingList() {
@@ -21,7 +22,7 @@ export default function BookingList() {
     try {
       const token = localStorage.getItem('token');
       const filterParam = filter !== 'all' ? `?status_filter=${filter}` : '';
-      const response = await fetch(`http://localhost:8000/bookings/my-bookings${filterParam}`, {
+      const response = await fetch(`${API_BASE}/bookings/my-bookings${filterParam}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -44,7 +45,7 @@ export default function BookingList() {
   const handleStatusUpdate = async (bookingId, newStatus, cancellationReason = null) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/bookings/${bookingId}/status`, {
+      const response = await fetch(`${API_BASE}/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

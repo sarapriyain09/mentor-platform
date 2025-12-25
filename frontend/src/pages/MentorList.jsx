@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';  // NEW
+import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api';
 import './MentorList.css';
 
 export default function MentorList() {
@@ -15,7 +16,7 @@ export default function MentorList() {
 
   const fetchMentors = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/mentors');
+      const res = await fetch(`${API_BASE}/profiles/mentors`);
       if (res.ok) {
         const data = await res.json();
         setMentors(data);
@@ -34,7 +35,7 @@ export default function MentorList() {
     if (!requestMessage) return;
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/mentorship/requests', {
+      const res = await fetch(`${API_BASE}/mentorship/requests`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

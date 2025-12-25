@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE } from '../api';
 import './BookingCalendar.css';
 
 export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBookingCreated }) {
@@ -41,7 +42,7 @@ export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBo
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:8000/bookings/availability/mentor/${mentorId}?start_date=${startDate}&end_date=${endDate}`,
+        `${API_BASE}/bookings/availability/mentor/${mentorId}?start_date=${startDate}&end_date=${endDate}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -100,7 +101,7 @@ export default function BookingCalendar({ mentorId, mentorName, hourlyRate, onBo
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/bookings/', {
+      const response = await fetch(`${API_BASE}/bookings/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

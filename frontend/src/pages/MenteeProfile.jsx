@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api';
 import './Profile.css';
 
 export default function MenteeProfile() {
@@ -20,7 +21,7 @@ export default function MenteeProfile() {
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/me', {
+      const res = await fetch(`${API_BASE}/profiles/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -43,7 +44,7 @@ export default function MenteeProfile() {
     const method = profile ? 'PUT' : 'POST';
     
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/mentee', {
+      const res = await fetch(`${API_BASE}/profiles/mentee`, {
         method,
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -69,7 +70,7 @@ export default function MenteeProfile() {
     
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/mentee', {
+      const res = await fetch(`${API_BASE}/profiles/mentee`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

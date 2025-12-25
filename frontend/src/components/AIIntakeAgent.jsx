@@ -1,5 +1,6 @@
 // frontend/src/components/AIIntakeAgent.jsx
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE } from '../api';
 import './AIIntakeAgent.css';
 
 export default function AIIntakeAgent({ onComplete }) {
@@ -34,7 +35,7 @@ export default function AIIntakeAgent({ onComplete }) {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/ai-agent/chat', {
+      const res = await fetch(`${API_BASE}/ai-agent/chat`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -140,7 +141,7 @@ export default function AIIntakeAgent({ onComplete }) {
     try {
       const token = localStorage.getItem('token');
       
-      const res = await fetch('http://127.0.0.1:8000/ai-agent/chat', {
+      const res = await fetch(`${API_BASE}/ai-agent/chat`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -176,7 +177,7 @@ export default function AIIntakeAgent({ onComplete }) {
     const token = localStorage.getItem('token');
     
     try {
-      const intakeRes = await fetch('http://127.0.0.1:8000/ai-agent/intake', {
+      const intakeRes = await fetch(`${API_BASE}/ai-agent/intake`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -195,7 +196,7 @@ export default function AIIntakeAgent({ onComplete }) {
 
       addMessage('ai', '🔍 Analyzing mentor database...');
       
-      const matchRes = await fetch('http://127.0.0.1:8000/ai-agent/matches', {
+      const matchRes = await fetch(`${API_BASE}/ai-agent/matches`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 

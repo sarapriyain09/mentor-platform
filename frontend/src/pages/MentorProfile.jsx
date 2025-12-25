@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api';
 import './Profile.css';
 
 export default function MentorProfile() {
@@ -24,7 +25,7 @@ export default function MentorProfile() {
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/me', {
+      const res = await fetch(`${API_BASE}/profiles/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -47,7 +48,7 @@ export default function MentorProfile() {
     const method = profile ? 'PUT' : 'POST';
     
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/mentor', {
+      const res = await fetch(`${API_BASE}/profiles/mentor`, {
         method,
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -73,7 +74,7 @@ export default function MentorProfile() {
     
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://127.0.0.1:8000/profiles/mentor', {
+      const res = await fetch(`${API_BASE}/profiles/mentor`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

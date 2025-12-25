@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE } from '../api';
 import './AvailabilityManager.css';
 
 export default function AvailabilityManager() {
@@ -40,7 +41,7 @@ export default function AvailabilityManager() {
   const fetchAvailability = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/bookings/availability/my-slots', {
+      const response = await fetch(`${API_BASE}/bookings/availability/my-slots`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,7 +59,7 @@ export default function AvailabilityManager() {
   const fetchBlockedDates = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/bookings/blocked-dates/my-dates', {
+      const response = await fetch(`${API_BASE}/bookings/blocked-dates/my-dates`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -80,7 +81,7 @@ export default function AvailabilityManager() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/bookings/availability', {
+      const response = await fetch(`${API_BASE}/bookings/availability`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +110,7 @@ export default function AvailabilityManager() {
   const handleToggleSlot = async (slotId, isActive) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/bookings/availability/${slotId}`, {
+      const response = await fetch(`${API_BASE}/bookings/availability/${slotId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +132,7 @@ export default function AvailabilityManager() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/bookings/availability/${slotId}`, {
+      const response = await fetch(`${API_BASE}/bookings/availability/${slotId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -154,7 +155,7 @@ export default function AvailabilityManager() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/bookings/blocked-dates', {
+      const response = await fetch(`${API_BASE}/bookings/blocked-dates`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +186,7 @@ export default function AvailabilityManager() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/bookings/blocked-dates/${blockedId}`, {
+      const response = await fetch(`${API_BASE}/bookings/blocked-dates/${blockedId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

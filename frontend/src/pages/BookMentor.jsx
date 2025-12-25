@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api';
 import BookingCalendar from '../components/BookingCalendar';
 import './BookMentor.css';
 
@@ -17,7 +18,7 @@ export default function BookMentor() {
   const fetchMentorDetails = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/profiles/mentor/${mentorId}`, {
+      const response = await fetch(`${API_BASE}/profiles/mentor/${mentorId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
