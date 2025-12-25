@@ -145,14 +145,14 @@ def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(g
             status_code=400, 
             detail="User role not set. Please contact support or re-register."
         )
-    
-    if current_user.role == "mentor":
+    role = current_user.role.lower()
+    if role == "mentor":
         profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
         if not profile:
             return {"type": "mentor", "profile": None, "exists": False}
         return {"type": "mentor", "profile": profile, "exists": True}
     
-    elif current_user.role == "mentee":
+    elif role == "mentee":
         profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
         if not profile:
             return {"type": "mentee", "profile": None, "exists": False}
