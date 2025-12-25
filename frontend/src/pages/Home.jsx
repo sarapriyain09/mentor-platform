@@ -211,7 +211,7 @@ export default function Home() {
       </section>
 
       <footer className="home-footer">
-        <p>&copy; 2025 Mentor Platform. Where clarity meets mentorship.</p>
+        <p>&copy; 2025 MendForWorks. Where clarity meets mentorship.</p>
       </footer>
     </div>
   );

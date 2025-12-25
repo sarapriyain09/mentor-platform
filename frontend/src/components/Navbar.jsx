@@ -15,8 +15,8 @@ export default function Navbar({ user, setUser }) {
     <nav className="navbar">
       <div className="nav-brand">
         <Link to="/">
-          <img src="/icon.svg" alt="Mentor Platform" className="nav-logo" />
-          <span>Mentor Platform</span>
+          <img src="/icon.svg" alt="MendForWorks" className="nav-logo" />
+          <span>MendForWorks</span>
         </Link>
       </div>
       {user ? (
