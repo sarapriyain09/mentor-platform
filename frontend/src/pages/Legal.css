@@ -29,14 +29,14 @@
 }
 
 .legal-container section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .legal-container h2 {
   color: #2c3e50;
   font-size: 1.8rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
   border-left: 4px solid #3498db;
   padding-left: 1rem;
 }
@@ -44,26 +44,26 @@
 .legal-container h3 {
   color: #34495e;
   font-size: 1.3rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.8rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .legal-container p {
   color: #555;
-  line-height: 1.8;
-  margin-bottom: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
   font-size: 1.05rem;
 }
 
 .legal-container ul {
   margin-left: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .legal-container li {
   color: #555;
-  line-height: 1.8;
-  margin-bottom: 0.5rem;
+  line-height: 1.6;
+  margin-bottom: 0.3rem;
   font-size: 1.05rem;
 }
 
