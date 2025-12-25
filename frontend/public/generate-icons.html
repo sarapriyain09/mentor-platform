@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Generate App Icons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 1rem;
+            background: white;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Mentor Platform - App Icon Generator</h2>
+        <p>Click the buttons below to download the icons</p>
+        
+        <div>
+            <canvas id="canvas192" width="192" height="192"></canvas>
+            <canvas id="canvas512" width="512" height="512"></canvas>
+        </div>
+        
+        <div>
+            <button onclick="downloadIcon(192)">Download 192x192 Icon</button>
+            <button onclick="downloadIcon(512)">Download 512x512 Icon</button>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            const scale = size / 192;
+            
+            // Apply scaling
+            ctx.scale(scale, scale);
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 192, 192);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // Background with rounded corners
+            ctx.fillStyle = gradient;
+            roundRect(ctx, 0, 0, 192, 192, 40);
+            ctx.fill();
+            
+            // Draw two people icons
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            
+            // First person (mentor) - head
+            ctx.beginPath();
+            ctx.arc(81, 76, 18, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // First person - body
+            ctx.beginPath();
+            ctx.moveTo(61, 126);
+            ctx.quadraticCurveTo(61, 96, 81, 96);
+            ctx.quadraticCurveTo(101, 96, 101, 126);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Second person (mentee) - head
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.arc(111, 81, 16, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Second person - body
+            ctx.beginPath();
+            ctx.moveTo(96, 126);
+            ctx.quadraticCurveTo(96, 101, 111, 101);
+            ctx.quadraticCurveTo(126, 101, 131, 126);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Connection line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(91, 106);
+            ctx.lineTo(106, 106);
+            ctx.stroke();
+            
+            // Letter M
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 48px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('M', 96, 165);
+        }
+        
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        function downloadIcon(size) {
+            const canvas = document.getElementById('canvas' + size);
+            const link = document.createElement('a');
+            link.download = 'icon-' + size + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Draw icons on page load
+        window.onload = function() {
+            drawIcon(document.getElementById('canvas192'));
+            drawIcon(document.getElementById('canvas512'));
+        };
+    </script>
+</body>
+</html>
