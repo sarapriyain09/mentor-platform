@@ -13,6 +13,8 @@ import Requests from './pages/Requests';
 import AIIntakeFlow from './pages/AIIntakeFlow';
 import Bookings from './pages/Bookings';
 import BookMentor from './pages/BookMentor';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import Navbar from './components/Navbar';
 import './App.css';
 
@@ -83,6 +85,8 @@ export default function App() {
                 <BookMentor />
               </ProtectedRoute>
             } />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
           </Routes>
         </div>
       </div>

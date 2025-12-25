@@ -10,6 +10,7 @@ export default function Register() {
     full_name: "",
     role: "MENTEE",
   });
+  const [gdprConsent, setGdprConsent] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -18,6 +19,12 @@ export default function Register() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    
+    if (!gdprConsent) {
+      setError("You must agree to the Privacy Policy and Terms of Service to register.");
+      return;
+    }
+    
     try {
       const res = await registerUser(form);
       console.log("Registration response:", res); // Debug log
@@ -68,6 +75,22 @@ export default function Register() {
             <option value="MENTEE">I'm looking for a mentor (Mentee)</option>
             <option value="MENTOR">I want to be a mentor (Mentor)</option>
           </select>
+          
+          <div className="gdpr-consent">
+            <label className="checkbox-label">
+              <input 
+                type="checkbox" 
+                checked={gdprConsent}
+                onChange={(e) => setGdprConsent(e.target.checked)}
+                required
+              />
+              <span>
+                I agree to the <Link to="/privacy-policy" target="_blank">Privacy Policy</Link> and{' '}
+                <Link to="/terms-of-service" target="_blank">Terms of Service</Link>
+              </span>
+            </label>
+          </div>
+          
           <button type="submit" className="btn-primary">Register</button>
         </form>
         <p className="auth-link">
