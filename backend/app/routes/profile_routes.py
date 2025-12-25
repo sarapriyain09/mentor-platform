@@ -17,7 +17,7 @@ router = APIRouter(
 @router.post("/mentor", response_model=MentorProfileOut)
 def create_mentor_profile(profile: MentorProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # Role check
-    if current_user.role != "mentor":
+    if str(current_user.role).lower() != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can create mentor profiles")
     
     db_profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
@@ -37,7 +37,7 @@ def create_mentor_profile(profile: MentorProfileCreate, db: Session = Depends(ge
 @router.put("/mentor", response_model=MentorProfileOut)
 def update_mentor_profile(profile: MentorProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # Role check
-    if current_user.role != "mentor":
+    if str(current_user.role).lower() != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can update mentor profiles")
     
     db_profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
@@ -58,7 +58,7 @@ def update_mentor_profile(profile: MentorProfileCreate, db: Session = Depends(ge
 # -------------------------
 @router.delete("/mentor")
 def delete_mentor_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if current_user.role != "mentor":
+    if str(current_user.role).lower() != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can delete mentor profiles")
     
     db_profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
@@ -79,7 +79,7 @@ def create_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(ge
     print(f"DEBUG: Creating mentee profile - User ID: {current_user.id}, Email: {current_user.email}, Role: {current_user.role}")
     
     # Role check
-    if current_user.role.lower() != "mentee":
+    if str(current_user.role).lower() != "mentee":
         raise HTTPException(status_code=403, detail=f"Only mentees can create mentee profiles. Current role: {current_user.role}")
     
     db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
@@ -99,7 +99,7 @@ def create_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(ge
 @router.put("/mentee", response_model=MenteeProfileOut)
 def update_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # Role check
-    if current_user.role != "mentee":
+    if str(current_user.role).lower() != "mentee":
         raise HTTPException(status_code=403, detail="Only mentees can update mentee profiles")
     
     db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
@@ -120,7 +120,7 @@ def update_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(ge
 # -------------------------
 @router.delete("/mentee")
 def delete_mentee_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if current_user.role != "mentee":
+    if str(current_user.role).lower() != "mentee":
         raise HTTPException(status_code=403, detail="Only mentees can delete mentee profiles")
     
     db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
@@ -140,12 +140,12 @@ def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(g
     # Debug logging
     print(f"DEBUG /profiles/me - User ID: {current_user.id}, Email: {current_user.email}, Role: {current_user.role}")
     
-    if not current_user.role:
+    if current_user.role is None:
         raise HTTPException(
             status_code=400, 
             detail="User role not set. Please contact support or re-register."
         )
-    role = current_user.role.lower()
+    role = str(current_user.role).lower()
     if role == "mentor":
         profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
         if not profile:

@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import Optional, cast
 from app.database import get_db
 from app.models.user import User
 from app.schemas import UserCreate, UserResponse, UserLogin, Token, ForgotPasswordRequest, ResetPasswordRequest, MessageResponse
@@ -35,12 +36,14 @@ async def register_user(user: UserCreate, background_tasks: BackgroundTasks, db:
     db.refresh(new_user)
     
     # Send welcome email in background
-    background_tasks.add_task(send_welcome_email, new_user.email, new_user.full_name, new_user.role)
-    
-    # Return user with role in lowercase for frontend compatibility
-    user_dict = new_user.__dict__.copy()
-    user_dict['role'] = new_user.role.lower()
-    return user_dict
+    background_tasks.add_task(
+        send_welcome_email,
+        cast(str, new_user.email),
+        cast(str, new_user.full_name),
+        cast(str, new_user.role),
+    )
+
+    return new_user
 
 # -------------------------
 # Login User
@@ -51,11 +54,11 @@ def login_user(user_credentials: UserLogin, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    if not verify_password(user_credentials.password, user.password):
+    if not verify_password(user_credentials.password, cast(str, user.password)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    token = create_access_token(user.id)
-    return {"access_token": token, "token_type": "bearer", "role": user.role.lower()}
+    token = create_access_token(cast(int, user.id))
+    return {"access_token": token, "token_type": "bearer", "role": cast(str, user.role).lower()}
 
 # -------------------------
 # Forgot Password
@@ -70,12 +73,17 @@ async def forgot_password(request: ForgotPasswordRequest, background_tasks: Back
     
     # Generate reset token
     reset_token = generate_reset_token()
-    user.reset_token = reset_token
-    user.reset_token_expiry = get_reset_token_expiry()
+    setattr(user, 'reset_token', reset_token)
+    setattr(user, 'reset_token_expiry', get_reset_token_expiry())
     db.commit()
     
     # Send reset email in background
-    background_tasks.add_task(send_password_reset_email, user.email, user.full_name, reset_token)
+    background_tasks.add_task(
+        send_password_reset_email,
+        cast(str, user.email),
+        cast(str, user.full_name),
+        reset_token,
+    )
     
     return {"message": "If that email exists, a password reset link has been sent"}
 
@@ -93,16 +101,17 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
         )
     
     # Check if token is expired
-    if not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
+    expiry = cast(Optional[datetime], user.reset_token_expiry)
+    if expiry is None or expiry < datetime.utcnow():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Reset token has expired"
         )
     
     # Update password and clear reset token
-    user.password = hash_password(request.new_password)
-    user.reset_token = None
-    user.reset_token_expiry = None
+    setattr(user, 'password', hash_password(request.new_password))
+    setattr(user, 'reset_token', None)
+    setattr(user, 'reset_token_expiry', None)
     db.commit()
     
     return {"message": "Password has been reset successfully"}

@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from typing import Optional, cast
 from app.database import get_db
 from app.models.feedback import SessionFeedback
 from app.models.booking import Booking
@@ -31,7 +32,7 @@ async def complete_session(
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    if booking.mentor_id != current_user.id:
+    if cast(int, booking.mentor_id) != cast(int, current_user.id):
         raise HTTPException(status_code=403, detail="This booking doesn't belong to you")
     
     # Check if already completed
@@ -39,12 +40,12 @@ async def complete_session(
         SessionFeedback.booking_id == request.booking_id
     ).first()
     
-    if existing_feedback and existing_feedback.session_completed_at:
+    if existing_feedback is not None and cast(Optional[datetime], existing_feedback.session_completed_at) is not None:
         raise HTTPException(status_code=400, detail="Session already marked as complete")
     
     # Create or update feedback record
-    if existing_feedback:
-        existing_feedback.session_completed_at = datetime.utcnow()
+    if existing_feedback is not None:
+        setattr(existing_feedback, "session_completed_at", datetime.utcnow())
     else:
         feedback = SessionFeedback(
             booking_id=request.booking_id,
@@ -56,7 +57,7 @@ async def complete_session(
         db.add(feedback)
     
     # Update booking status
-    booking.status = "completed"
+    setattr(booking, "status", "completed")
     
     db.commit()
     
@@ -76,11 +77,11 @@ async def submit_feedback(
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    if booking.mentee_id != current_user.id:
+    if cast(int, booking.mentee_id) != cast(int, current_user.id):
         raise HTTPException(status_code=403, detail="This booking doesn't belong to you")
     
     # Check if session is completed
-    if booking.status != "completed":
+    if cast(str, booking.status) != "completed":
         raise HTTPException(status_code=400, detail="Session must be marked complete by mentor first")
     
     # Check if feedback already exists
@@ -88,14 +89,14 @@ async def submit_feedback(
         SessionFeedback.booking_id == request.booking_id
     ).first()
     
-    if existing_feedback and existing_feedback.rating > 0:
+    if existing_feedback is not None and cast(Optional[int], existing_feedback.rating) is not None and cast(int, existing_feedback.rating) > 0:
         raise HTTPException(status_code=400, detail="Feedback already submitted for this session")
     
     # Create or update feedback
-    if existing_feedback:
-        existing_feedback.rating = request.rating
-        existing_feedback.feedback_text = request.feedback_text
-        existing_feedback.updated_at = datetime.utcnow()
+    if existing_feedback is not None:
+        setattr(existing_feedback, "rating", request.rating)
+        setattr(existing_feedback, "feedback_text", request.feedback_text)
+        setattr(existing_feedback, "updated_at", datetime.utcnow())
         feedback = existing_feedback
     else:
         feedback = SessionFeedback(
@@ -137,8 +138,8 @@ async def get_mentor_ratings(mentor_id: int, db: Session = Depends(get_db)):
     
     # Calculate stats
     total = len(feedbacks)
-    ratings = [f.rating for f in feedbacks]
-    average = sum(ratings) / total
+    ratings: list[int] = [cast(int, f.rating) for f in feedbacks if cast(Optional[int], f.rating) is not None]
+    average: float = (sum(ratings) / total) if total > 0 else 0.0
     
     return MentorRatingsSummary(
         mentor_id=mentor_id,
