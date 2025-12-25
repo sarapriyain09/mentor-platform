@@ -61,6 +61,34 @@ def get_tasks():
 Base.metadata.create_all(bind=engine)
 
 # -------------------------
+# Auto-migrate: Add password reset columns if they don't exist
+# -------------------------
+def _add_password_reset_columns():
+    """Add reset_token and reset_token_expiry columns to users table if they don't exist"""
+    from sqlalchemy import text, inspect
+    
+    try:
+        inspector = inspect(engine)
+        columns = [col['name'] for col in inspector.get_columns('users')]
+        
+        with engine.connect() as conn:
+            if 'reset_token' not in columns:
+                print("Adding reset_token column...")
+                conn.execute(text("ALTER TABLE users ADD COLUMN reset_token VARCHAR"))
+                conn.commit()
+                print("✅ Added reset_token column")
+            
+            if 'reset_token_expiry' not in columns:
+                print("Adding reset_token_expiry column...")
+                conn.execute(text("ALTER TABLE users ADD COLUMN reset_token_expiry TIMESTAMP"))
+                conn.commit()
+                print("✅ Added reset_token_expiry column")
+    except Exception as e:
+        print(f"Migration check: {str(e)}")
+
+_add_password_reset_columns()
+
+# -------------------------
 # Seed demo note
 # -------------------------
 def _seed_demo_note():
