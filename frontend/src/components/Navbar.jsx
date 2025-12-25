@@ -21,6 +21,7 @@ export default function Navbar({ user, setUser }) {
       </div>
       {user ? (
         <div className="nav-links">
+          <Link to="/">Home</Link>
           <Link to="/dashboard">Dashboard</Link>
           {user.role === 'mentee' && (
             <Link 
