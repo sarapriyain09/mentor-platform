@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mendforworks-v1';
+const CACHE_NAME = 'mendforworks-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -39,16 +39,31 @@ self.addEventListener('activate', (event) => {
 
 // Fetch strategy: Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Don't cache API requests
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('mentor-platform-t9g9.onrender.com')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response
-        const responseToCache = response.clone();
-        
-        caches.open(CACHE_NAME)
-          .then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+        // Only cache successful responses
+        if (response && response.status === 200) {
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+        }
         
         return response;
       })

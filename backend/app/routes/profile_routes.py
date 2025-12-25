@@ -137,14 +137,14 @@ def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(g
     if current_user.role == "mentor":
         profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
         if not profile:
-            raise HTTPException(status_code=404, detail="Mentor profile not found. Create one first.")
-        return {"type": "mentor", "profile": profile}
+            return {"type": "mentor", "profile": None, "exists": False}
+        return {"type": "mentor", "profile": profile, "exists": True}
     
     elif current_user.role == "mentee":
         profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
         if not profile:
-            raise HTTPException(status_code=404, detail="Mentee profile not found. Create one first.")
-        return {"type": "mentee", "profile": profile}
+            return {"type": "mentee", "profile": None, "exists": False}
+        return {"type": "mentee", "profile": profile, "exists": True}
     
     else:
         raise HTTPException(status_code=400, detail="Invalid user role")
