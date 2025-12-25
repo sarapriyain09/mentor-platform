@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
             <li><strong>Withdraw Consent:</strong> At any time, where consent is the legal basis</li>
           </ul>
           <p>
-            To exercise these rights, contact us at <a href="mailto:privacy@mendforworks.com">privacy@mendforworks.com</a>
+            To exercise these rights, contact us at <a href="mailto:contact@mendforworks.com">contact@mendforworks.com</a>
           </p>
         </section>
 
@@ -144,8 +144,7 @@ export default function PrivacyPolicy() {
             For questions about this Privacy Policy or to exercise your rights, contact us at:
           </p>
           <p>
-            Email: <a href="mailto:privacy@mendforworks.com">privacy@mendforworks.com</a><br />
-            Data Protection Officer: <a href="mailto:dpo@mendforworks.com">dpo@mendforworks.com</a>
+            Email: <a href="mailto:contact@mendforworks.com">contact@mendforworks.com</a>
           </p>
         </section>
 

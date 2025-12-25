@@ -214,7 +214,7 @@ export default function TermsOfService() {
             For questions about these Terms of Service, contact us at:
           </p>
           <p>
-            Email: <a href="mailto:legal@mendforworks.com">legal@mendforworks.com</a><br />
+            Email: <a href="mailto:contact@mendforworks.com">contact@mendforworks.com</a><br />
             Support: <a href="mailto:contact@mendforworks.com">contact@mendforworks.com</a>
           </p>
         </section>
