@@ -7,16 +7,51 @@ from email.mime.multipart import MIMEMultipart
 import aiosmtplib
 from typing import Optional
 
-# Email configuration from environment variables
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER = os.getenv("SMTP_USER", "")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://mendforworks.vercel.app")
+def _env(name: str, default: str = "") -> str:
+    # Render / dashboards sometimes introduce accidental whitespace.
+    return (os.getenv(name, default) or "").strip()
 
-# Debug: Log email configuration on startup (mask password)
-print(f"📧 Email Config: SMTP_HOST={SMTP_HOST}, PORT={SMTP_PORT}, USER={SMTP_USER}, FROM={FROM_EMAIL}")
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = _env(name, "1" if default else "0").lower()
+    return raw in {"1", "true", "yes", "y", "on"}
+
+
+def _get_email_config() -> dict:
+    smtp_host = _env("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(_env("SMTP_PORT", "587") or "587")
+    smtp_user = _env("SMTP_USER", "")
+    smtp_password = _env("SMTP_PASSWORD", "")
+    from_email = _env("FROM_EMAIL", "") or smtp_user
+    frontend_url = _env("FRONTEND_URL", "https://mendforworks.vercel.app")
+    # Most providers use STARTTLS on 587; set SMTP_STARTTLS=false if using implicit SSL (465)
+    smtp_starttls = _env_bool("SMTP_STARTTLS", True)
+    smtp_use_tls = _env_bool("SMTP_USE_TLS", False)
+    email_enabled = _env_bool("EMAIL_ENABLED", True)
+
+    return {
+        "SMTP_HOST": smtp_host,
+        "SMTP_PORT": smtp_port,
+        "SMTP_USER": smtp_user,
+        "SMTP_PASSWORD": smtp_password,
+        "FROM_EMAIL": from_email,
+        "FRONTEND_URL": frontend_url,
+        "SMTP_STARTTLS": smtp_starttls,
+        "SMTP_USE_TLS": smtp_use_tls,
+        "EMAIL_ENABLED": email_enabled,
+    }
+
+
+# Debug: Log email configuration on startup (do not log passwords)
+_cfg = _get_email_config()
+print(
+    "📧 Email Config: "
+    f"HOST={_cfg['SMTP_HOST']}, PORT={_cfg['SMTP_PORT']}, "
+    f"USER={'set' if bool(_cfg['SMTP_USER']) else 'missing'}, "
+    f"PASS={'set' if bool(_cfg['SMTP_PASSWORD']) else 'missing'}, "
+    f"FROM={_cfg['FROM_EMAIL']}, "
+    f"STARTTLS={_cfg['SMTP_STARTTLS']}, TLS={_cfg['SMTP_USE_TLS']}, ENABLED={_cfg['EMAIL_ENABLED']}"
+)
 
 
 def generate_reset_token() -> str:
@@ -39,13 +74,21 @@ async def send_email(to_email: str, subject: str, html_content: str, text_conten
         html_content: HTML version of email body
         text_content: Plain text version (optional, will use HTML if not provided)
     """
-    if not SMTP_USER or not SMTP_PASSWORD:
-        print(f"⚠️ Email not configured. Would have sent to {to_email}: {subject}")
+    cfg = _get_email_config()
+    if not cfg["EMAIL_ENABLED"]:
+        print(f"⚠️ Email disabled (EMAIL_ENABLED=false). Would have sent to {to_email}: {subject}")
+        return False
+
+    if not cfg["SMTP_USER"] or not cfg["SMTP_PASSWORD"]:
+        print(
+            f"⚠️ Email not configured (missing SMTP_USER/SMTP_PASSWORD). "
+            f"Would have sent to {to_email}: {subject}"
+        )
         return False
     
     message = MIMEMultipart("alternative")
     message["Subject"] = subject
-    message["From"] = FROM_EMAIL
+    message["From"] = cfg["FROM_EMAIL"]
     message["To"] = to_email
     
     # Add plain text and HTML versions
@@ -58,16 +101,20 @@ async def send_email(to_email: str, subject: str, html_content: str, text_conten
     try:
         await aiosmtplib.send(
             message,
-            hostname=SMTP_HOST,
-            port=SMTP_PORT,
-            username=SMTP_USER,
-            password=SMTP_PASSWORD,
-            start_tls=True,
+            hostname=cfg["SMTP_HOST"],
+            port=cfg["SMTP_PORT"],
+            username=cfg["SMTP_USER"],
+            password=cfg["SMTP_PASSWORD"],
+            start_tls=cfg["SMTP_STARTTLS"],
+            use_tls=cfg["SMTP_USE_TLS"],
         )
         print(f"✅ Email sent successfully to {to_email}")
         return True
     except Exception as e:
-        print(f"❌ Failed to send email to {to_email}: {str(e)}")
+        print(
+            f"❌ Failed to send email to {to_email}: {type(e).__name__}: {str(e)} "
+            f"(host={cfg['SMTP_HOST']} port={cfg['SMTP_PORT']} user={'set' if bool(cfg['SMTP_USER']) else 'missing'})"
+        )
         return False
 
 
@@ -107,7 +154,7 @@ async def send_welcome_email(to_email: str, full_name: str, role: str):
                 </ul>
                 
                 <p style="text-align: center;">
-                    <a href="{FRONTEND_URL}/dashboard" class="button">Go to Dashboard</a>
+                    <a href="{_get_email_config()['FRONTEND_URL']}/dashboard" class="button">Go to Dashboard</a>
                 </p>
                 
                 <p>If you have any questions, feel free to reach out to our support team.</p>
@@ -129,7 +176,7 @@ async def send_welcome_email(to_email: str, full_name: str, role: str):
     
     Thank you for joining MendForWorks as a {role}! We're excited to have you on board.
     
-    Visit your dashboard: {FRONTEND_URL}/dashboard
+    Visit your dashboard: {_get_email_config()['FRONTEND_URL']}/dashboard
     
     Best regards,
     The MendForWorks Team
@@ -142,7 +189,7 @@ async def send_welcome_email(to_email: str, full_name: str, role: str):
 
 async def send_password_reset_email(to_email: str, full_name: str, reset_token: str):
     """Send password reset email with reset link"""
-    reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
+    reset_link = f"{_get_email_config()['FRONTEND_URL']}/reset-password?token={reset_token}"
     subject = "Reset Your MendForWorks Password"
     
     html_content = f"""
