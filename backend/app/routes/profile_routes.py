@@ -140,6 +140,15 @@ def delete_mentee_profile(db: Session = Depends(get_db), current_user: User = De
 @router.get("/me")
 def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """Get the current user's profile (mentor or mentee)"""
+    # Debug logging
+    print(f"DEBUG /profiles/me - User ID: {current_user.id}, Email: {current_user.email}, Role: {current_user.role}")
+    
+    if not current_user.role:
+        raise HTTPException(
+            status_code=400, 
+            detail="User role not set. Please contact support or re-register."
+        )
+    
     if current_user.role == "mentor":
         profile = db.query(MentorProfile).filter(MentorProfile.user_id == current_user.id).first()
         if not profile:
@@ -153,7 +162,10 @@ def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(g
         return {"type": "mentee", "profile": profile, "exists": True}
     
     else:
-        raise HTTPException(status_code=400, detail="Invalid user role")
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid user role: '{current_user.role}'. Expected 'mentor' or 'mentee'."
+        )
 
 
 # -------------------------

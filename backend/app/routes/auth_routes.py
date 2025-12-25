@@ -110,3 +110,15 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
 @router.get("/users", response_model=list[UserResponse])
 def list_users(db: Session = Depends(get_db)):
     return db.query(User).all()
+
+# -------------------------
+# Get current user info (for debugging)
+# -------------------------
+@router.get("/me")
+def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+        "role": current_user.role
+    }
