@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Home from './pages/Home';
 import Login from './Login';
 import Register from './Register';
 import Dashboard from './pages/Dashboard';
@@ -35,7 +36,7 @@ export default function App() {
         <Navbar user={user} setUser={setUser} />
         <div className="container">
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={
