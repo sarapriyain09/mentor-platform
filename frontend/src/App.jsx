@@ -16,6 +16,7 @@ import BookMentor from './pages/BookMentor';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -89,6 +90,7 @@ export default function App() {
             <Route path="/terms-of-service" element={<TermsOfService />} />
           </Routes>
         </div>
+        <Footer />
       </div>
     </BrowserRouter>
   );
