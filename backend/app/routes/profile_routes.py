@@ -75,9 +75,15 @@ def delete_mentor_profile(db: Session = Depends(get_db), current_user: User = De
 # -------------------------
 @router.post("/mentee", response_model=MenteeProfileOut)
 def create_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Debug logging
+    print(f"DEBUG: Creating mentee profile - User ID: {current_user.id}, Email: {current_user.email}, Role: {current_user.role}")
+    
     # Role check
     if current_user.role != "mentee":
-        raise HTTPException(status_code=403, detail="Only mentees can create mentee profiles")
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Only mentees can create mentee profiles. Current role: {current_user.role}"
+        )
     
     db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
     if db_profile:
