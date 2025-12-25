@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
           </ul>
         </section>
 
-        <section>
+        <section id="gdpr">
           <h2>4. Legal Basis for Processing (GDPR)</h2>
           <p>Under GDPR, we process your data based on:</p>
           <ul>
