@@ -68,3 +68,22 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
 
     user = db.query(User).filter(User.id == token_data.id).first()
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+# --------------------------
+# ROLE REQUIREMENT
+# --------------------------
+
+def require_role(required_role: str):
+    """Dependency to check if user has required role"""
+    def role_checker(current_user: User = Depends(get_current_user)):
+        if current_user.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. {required_role.capitalize()} role required."
+            )
+        return current_user
+    return role_checker
