@@ -69,7 +69,7 @@ Base.metadata.create_all(bind=engine)
 # Auto-migrate: Add password reset columns if they don't exist
 # -------------------------
 def _add_password_reset_columns():
-    """Add reset_token and reset_token_expiry columns to users table if they don't exist"""
+    """Add missing columns to users table if they don't exist"""
     from sqlalchemy import text, inspect
     
     try:
@@ -77,6 +77,12 @@ def _add_password_reset_columns():
         columns = [col['name'] for col in inspector.get_columns('users')]
         
         with engine.connect() as conn:
+            if 'full_name' not in columns:
+                print("Adding full_name column...")
+                conn.execute(text("ALTER TABLE users ADD COLUMN full_name VARCHAR"))
+                conn.commit()
+                print("✅ Added full_name column")
+            
             if 'reset_token' not in columns:
                 print("Adding reset_token column...")
                 conn.execute(text("ALTER TABLE users ADD COLUMN reset_token VARCHAR"))
