@@ -5,6 +5,7 @@ import './Profile.css';
 
 export default function MenteeProfile() {
   const [profile, setProfile] = useState(null);
+  const [mode, setMode] = useState('view'); // 'view' | 'edit' | 'create' | 'empty'
   const [form, setForm] = useState({
     name: '',
     goals: '',
@@ -29,6 +30,10 @@ export default function MenteeProfile() {
         if (data.profile) {
           setProfile(data.profile);
           setForm(data.profile);
+          setMode('view');
+        } else {
+          setProfile(null);
+          setMode('empty');
         }
       }
     } catch (err) {
@@ -55,7 +60,8 @@ export default function MenteeProfile() {
       
       if (res.ok) {
         setMessage(profile ? 'Profile updated successfully!' : 'Profile created successfully!');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        await fetchProfile();
+        setMode('view');
       } else {
         const error = await res.json();
         setMessage(error.detail || 'Failed to save profile');
@@ -77,7 +83,13 @@ export default function MenteeProfile() {
       
       if (res.ok) {
         setMessage('Profile deleted successfully!');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setProfile(null);
+        setForm({
+          name: '',
+          goals: '',
+          background: ''
+        });
+        setMode('empty');
       }
     } catch (err) {
       setMessage('Failed to delete profile');
@@ -86,9 +98,67 @@ export default function MenteeProfile() {
 
   if (loading) return <div className="loading">Loading...</div>;
 
+  if (mode === 'empty') {
+    return (
+      <div className="profile-page">
+        <h1>My Profile</h1>
+        {message && <div className={message.includes('success') ? 'success' : 'error'}>{message}</div>}
+        <div className="profile-empty">
+          <div className="profile-empty-icon" aria-hidden="true">👤</div>
+          <h2>No profile yet</h2>
+          <p>Add your profile to start booking sessions with mentors.</p>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => {
+              setMessage('');
+              setMode('create');
+            }}
+          >
+            Add Your Profile
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'view' && profile) {
+    return (
+      <div className="profile-page">
+        <h1>My Profile</h1>
+        {message && <div className={message.includes('success') ? 'success' : 'error'}>{message}</div>}
+        <div className="profile-card">
+          <h2 className="profile-card-title">{profile.name}</h2>
+          <div className="profile-card-row"><strong>Goals:</strong> {profile.goals}</div>
+          <div className="profile-card-row"><strong>Background:</strong> {profile.background}</div>
+          <div className="form-actions">
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => {
+                setMessage('');
+                setMode('edit');
+              }}
+            >
+              Edit Profile
+            </button>
+            <button type="button" onClick={handleDelete} className="btn-danger">
+              Delete Profile
+            </button>
+            <button type="button" onClick={() => navigate('/dashboard')} className="btn-secondary">
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isEditing = mode === 'edit' && profile;
+
   return (
     <div className="profile-page">
-      <h1>{profile ? 'Edit Mentee Profile' : 'Create Mentee Profile'}</h1>
+      <h1>{isEditing ? 'Edit Mentee Profile' : 'Create Mentee Profile'}</h1>
       
       {message && <div className={message.includes('success') ? 'success' : 'error'}>{message}</div>}
       
@@ -127,14 +197,21 @@ export default function MenteeProfile() {
 
         <div className="form-actions">
           <button type="submit" className="btn-primary">
-            {profile ? 'Update Profile' : 'Create Profile'}
+            {isEditing ? 'Update Profile' : 'Create Profile'}
           </button>
-          {profile && (
+          {isEditing && (
             <button type="button" onClick={handleDelete} className="btn-danger">
               Delete Profile
             </button>
           )}
-          <button type="button" onClick={() => navigate('/dashboard')} className="btn-secondary">
+          <button
+            type="button"
+            onClick={() => {
+              setMessage('');
+              setMode(profile ? 'view' : 'empty');
+            }}
+            className="btn-secondary"
+          >
             Cancel
           </button>
         </div>
