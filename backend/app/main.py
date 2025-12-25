@@ -27,8 +27,13 @@ app = FastAPI(title="Mentoralab API")
 # -------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Temporarily allow all for testing
-    allow_credentials=False,  # Must be False with "*"
+    allow_origins=[
+        "https://mendforworks.vercel.app",
+        "https://www.mendforworks.com",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
