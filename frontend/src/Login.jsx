@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { loginUser, API_BASE } from "./api";
+import { loginUser } from "./api";
 import './Auth.css';
 
 export default function Login({ setUser }) {
@@ -13,21 +13,11 @@ export default function Login({ setUser }) {
     setError("");
     try {
       const res = await loginUser(form);
-      if (res.access_token) {
+      if (res.access_token && res.role) {
         localStorage.setItem("token", res.access_token);
-        // Decode JWT to get role (simple base64 decode)
-        const payload = JSON.parse(atob(res.access_token.split('.')[1]));
-        // Fetch user details to get role
-        const userRes = await fetch(`${API_BASE}/auth/users`, {
-          headers: { 'Authorization': `Bearer ${res.access_token}` }
-        });
-        const users = await userRes.json();
-        const currentUser = users.find(u => u.id === payload.user_id);
-        if (currentUser) {
-          localStorage.setItem("role", currentUser.role);
-          setUser({ role: currentUser.role });
-          navigate("/dashboard");
-        }
+        localStorage.setItem("role", res.role);
+        setUser({ role: res.role });
+        navigate("/dashboard");
       } else {
         setError(res.detail || "Login failed");
       }
