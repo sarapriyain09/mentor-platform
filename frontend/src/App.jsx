@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Home from './pages/Home';
 import Login from './Login';
 import Register from './Register';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 import Dashboard from './pages/Dashboard';
 import MentorProfile from './pages/MentorProfile';
 import MenteeProfile from './pages/MenteeProfile';
@@ -39,6 +41,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard user={user} />

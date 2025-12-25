@@ -59,6 +59,9 @@ export default function Login({ setUser }) {
           <button type="submit" className="btn-primary">Login</button>
         </form>
         <p className="auth-link">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
+        <p className="auth-link">
           Don't have an account? <Link to="/register">Register here</Link>
         </p>
       </div>

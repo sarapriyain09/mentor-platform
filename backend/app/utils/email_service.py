@@ -1,0 +1,212 @@
+# app/utils/email_service.py
+import os
+import secrets
+from datetime import datetime, timedelta
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import aiosmtplib
+from typing import Optional
+
+# Email configuration from environment variables
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://mendforworks.vercel.app")
+
+
+def generate_reset_token() -> str:
+    """Generate a secure random token for password reset"""
+    return secrets.token_urlsafe(32)
+
+
+def get_reset_token_expiry() -> datetime:
+    """Get expiry time for reset token (1 hour from now)"""
+    return datetime.utcnow() + timedelta(hours=1)
+
+
+async def send_email(to_email: str, subject: str, html_content: str, text_content: Optional[str] = None):
+    """
+    Send an email using SMTP
+    
+    Args:
+        to_email: Recipient email address
+        subject: Email subject
+        html_content: HTML version of email body
+        text_content: Plain text version (optional, will use HTML if not provided)
+    """
+    if not SMTP_USER or not SMTP_PASSWORD:
+        print(f"⚠️ Email not configured. Would have sent to {to_email}: {subject}")
+        return False
+    
+    message = MIMEMultipart("alternative")
+    message["Subject"] = subject
+    message["From"] = FROM_EMAIL
+    message["To"] = to_email
+    
+    # Add plain text and HTML versions
+    text_part = MIMEText(text_content or html_content, "plain")
+    html_part = MIMEText(html_content, "html")
+    
+    message.attach(text_part)
+    message.attach(html_part)
+    
+    try:
+        await aiosmtplib.send(
+            message,
+            hostname=SMTP_HOST,
+            port=SMTP_PORT,
+            username=SMTP_USER,
+            password=SMTP_PASSWORD,
+            start_tls=True,
+        )
+        print(f"✅ Email sent successfully to {to_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send email to {to_email}: {str(e)}")
+        return False
+
+
+async def send_welcome_email(to_email: str, full_name: str, role: str):
+    """Send welcome email to newly registered users"""
+    subject = "Welcome to MendForWorks! 🎉"
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+            .button {{ display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Welcome to MendForWorks!</h1>
+            </div>
+            <div class="content">
+                <p>Hi {full_name},</p>
+                
+                <p>Thank you for joining MendForWorks as a <strong>{role}</strong>! We're excited to have you on board.</p>
+                
+                <p>{'As a mentee, you can now:' if role == 'mentee' else 'As a mentor, you can now:'}</p>
+                <ul>
+                    {'<li>🤖 Use our AI agent to find the perfect mentor match</li>' if role == 'mentee' else '<li>📝 Create your mentor profile to showcase your expertise</li>'}
+                    {'<li>📅 Browse and connect with experienced mentors</li>' if role == 'mentee' else '<li>👥 Connect with mentees seeking your guidance</li>'}
+                    {'<li>💬 Start your mentorship journey with clarity</li>' if role == 'mentee' else '<li>📅 Manage your availability and bookings</li>'}
+                    <li>🎯 Track your progress and growth</li>
+                </ul>
+                
+                <p style="text-align: center;">
+                    <a href="{FRONTEND_URL}/dashboard" class="button">Go to Dashboard</a>
+                </p>
+                
+                <p>If you have any questions, feel free to reach out to our support team.</p>
+                
+                <p>Best regards,<br>The MendForWorks Team</p>
+            </div>
+            <div class="footer">
+                <p>© 2025 MendForWorks. Where Clarity Meets Mentorship.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    text_content = f"""
+    Welcome to MendForWorks!
+    
+    Hi {full_name},
+    
+    Thank you for joining MendForWorks as a {role}! We're excited to have you on board.
+    
+    Visit your dashboard: {FRONTEND_URL}/dashboard
+    
+    Best regards,
+    The MendForWorks Team
+    
+    © 2025 MendForWorks. Where Clarity Meets Mentorship.
+    """
+    
+    await send_email(to_email, subject, html_content, text_content)
+
+
+async def send_password_reset_email(to_email: str, full_name: str, reset_token: str):
+    """Send password reset email with reset link"""
+    reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
+    subject = "Reset Your MendForWorks Password"
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+            .button {{ display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+            .warning {{ background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔐 Password Reset Request</h1>
+            </div>
+            <div class="content">
+                <p>Hi {full_name},</p>
+                
+                <p>We received a request to reset your password for your MendForWorks account.</p>
+                
+                <p style="text-align: center;">
+                    <a href="{reset_link}" class="button">Reset Password</a>
+                </p>
+                
+                <p>Or copy and paste this link into your browser:</p>
+                <p style="background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 5px; word-break: break-all;">
+                    {reset_link}
+                </p>
+                
+                <div class="warning">
+                    <strong>⚠️ Security Note:</strong><br>
+                    This link will expire in 1 hour. If you didn't request this password reset, please ignore this email or contact support if you have concerns.
+                </div>
+                
+                <p>Best regards,<br>The MendForWorks Team</p>
+            </div>
+            <div class="footer">
+                <p>© 2025 MendForWorks. Where Clarity Meets Mentorship.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    text_content = f"""
+    Password Reset Request
+    
+    Hi {full_name},
+    
+    We received a request to reset your password for your MendForWorks account.
+    
+    Reset your password here: {reset_link}
+    
+    This link will expire in 1 hour.
+    
+    If you didn't request this password reset, please ignore this email.
+    
+    Best regards,
+    The MendForWorks Team
+    
+    © 2025 MendForWorks. Where Clarity Meets Mentorship.
+    """
+    
+    await send_email(to_email, subject, html_content, text_content)
