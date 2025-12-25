@@ -79,11 +79,8 @@ def create_mentee_profile(profile: MenteeProfileCreate, db: Session = Depends(ge
     print(f"DEBUG: Creating mentee profile - User ID: {current_user.id}, Email: {current_user.email}, Role: {current_user.role}")
     
     # Role check
-    if current_user.role != "mentee":
-        raise HTTPException(
-            status_code=403, 
-            detail=f"Only mentees can create mentee profiles. Current role: {current_user.role}"
-        )
+    if current_user.role.lower() != "mentee":
+        raise HTTPException(status_code=403, detail=f"Only mentees can create mentee profiles. Current role: {current_user.role}")
     
     db_profile = db.query(MenteeProfile).filter(MenteeProfile.user_id == current_user.id).first()
     if db_profile:
