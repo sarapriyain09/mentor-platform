@@ -63,69 +63,57 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <div className="auth-page">
-        <div className="auth-container">
-          <div className="error-message">
+      <div className="auth-container">
+        <div className="auth-box">
+          <div className="error">
             Invalid reset link. Please request a new password reset.
           </div>
-          <div className="auth-footer">
+          <p className="auth-link">
             <Link to="/forgot-password">Request Password Reset</Link>
-          </div>
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-header">
-          <h1>🔑 Reset Password</h1>
-          <p>Enter your new password</p>
-        </div>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2>🔑 Reset Password</h2>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: '1.5rem' }}>
+          Enter your new password
+        </p>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="error-message">{error}</div>}
-          {message && <div className="success-message">{message}</div>}
+        {error && <div className="error">{error}</div>}
+        {message && <div className="success">{message}</div>}
 
-          <div className="form-group">
-            <label htmlFor="password">New Password</label>
-            <input
-              id="password"
-              type="password"
-              required
-              placeholder="At least 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              minLength={6}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm New Password</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              required
-              placeholder="Re-enter your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={loading}
-              minLength={6}
-            />
-          </div>
-
-          <button type="submit" className="auth-button" disabled={loading}>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="password"
+            required
+            placeholder="New password (at least 6 characters)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            minLength={6}
+          />
+          <input
+            type="password"
+            required
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={loading}
+            minLength={6}
+          />
+          <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>
 
-        <div className="auth-footer">
-          <p>
-            Remember your password? <Link to="/login">Login</Link>
-          </p>
-        </div>
+        <p className="auth-link">
+          Remember your password? <Link to="/login">Login</Link>
+        </p>
       </div>
     </div>
   );

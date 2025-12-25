@@ -38,43 +38,36 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-header">
-          <h1>🔐 Forgot Password</h1>
-          <p>Enter your email and we'll send you a reset link</p>
-        </div>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2>🔐 Forgot Password</h2>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: '1.5rem' }}>
+          Enter your email and we'll send you a reset link
+        </p>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="error-message">{error}</div>}
-          {message && <div className="success-message">{message}</div>}
+        {error && <div className="error">{error}</div>}
+        {message && <div className="success">{message}</div>}
 
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              id="email"
-              type="email"
-              required
-              placeholder="your.email@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-
-          <button type="submit" className="auth-button" disabled={loading}>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            required
+            placeholder="your.email@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
+          <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Sending...' : 'Send Reset Link'}
           </button>
         </form>
 
-        <div className="auth-footer">
-          <p>
-            Remember your password? <Link to="/login">Login</Link>
-          </p>
-          <p>
-            Don't have an account? <Link to="/register">Register</Link>
-          </p>
-        </div>
+        <p className="auth-link">
+          Remember your password? <Link to="/login">Login</Link>
+        </p>
+        <p className="auth-link">
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
       </div>
     </div>
   );
