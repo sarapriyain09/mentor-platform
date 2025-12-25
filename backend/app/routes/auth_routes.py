@@ -27,7 +27,7 @@ async def register_user(user: UserCreate, background_tasks: BackgroundTasks, db:
     new_user = User(
         email=user.email,
         full_name=user.full_name,
-        role=user.role,
+        role=user.role.lower(),
         password=hash_password(user.password)
     )
     db.add(new_user)
@@ -37,7 +37,10 @@ async def register_user(user: UserCreate, background_tasks: BackgroundTasks, db:
     # Send welcome email in background
     background_tasks.add_task(send_welcome_email, new_user.email, new_user.full_name, new_user.role)
     
-    return new_user
+    # Return user with role in lowercase for frontend compatibility
+    user_dict = new_user.__dict__.copy()
+    user_dict['role'] = new_user.role.lower()
+    return user_dict
 
 # -------------------------
 # Login User
@@ -52,7 +55,7 @@ def login_user(user_credentials: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     token = create_access_token(user.id)
-    return {"access_token": token, "token_type": "bearer", "role": user.role}
+    return {"access_token": token, "token_type": "bearer", "role": user.role.lower()}
 
 # -------------------------
 # Forgot Password
@@ -116,6 +119,9 @@ def list_users(db: Session = Depends(get_db)):
 # -------------------------
 @router.get("/me")
 def get_current_user_info(current_user: User = Depends(get_current_user)):
+    if current_user.role.lower() != "mentor":
+        raise HTTPException(status_code=403, detail=f"Only mentors can create mentor profiles. Current role: {current_user.role}")
+        
     return {
         "id": current_user.id,
         "email": current_user.email,
