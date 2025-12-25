@@ -36,6 +36,12 @@ function splitList(value) {
     .filter(Boolean);
 }
 
+function domainOptionsFor(current) {
+  const value = String(current || '').trim();
+  if (!value) return DOMAIN_OPTIONS;
+  return DOMAIN_OPTIONS.includes(value) ? DOMAIN_OPTIONS : [value, ...DOMAIN_OPTIONS];
+}
+
 export default function MentorProfile() {
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
@@ -156,7 +162,7 @@ export default function MentorProfile() {
             onChange={(e) => setForm({ ...form, domains: e.target.value })}
           >
             <option value="" disabled>Select a domain</option>
-            {DOMAIN_OPTIONS.map((domain) => (
+            {domainOptionsFor(form.domains).map((domain) => (
               <option key={domain} value={domain}>{domain}</option>
             ))}
           </select>
