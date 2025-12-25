@@ -221,7 +221,7 @@ async def get_mentor_balance(
 ):
     """Get mentor's current balance"""
     
-    if current_user.role != "MENTOR":
+    if current_user.role.lower() != "mentor":
         raise HTTPException(status_code=403, detail="Only mentors can view balance")
     
     balance = db.query(MentorBalance).filter(
@@ -251,7 +251,7 @@ async def get_payment_history(
 ):
     """Get payment history for current user"""
     
-    if current_user.role == "MENTOR":
+    if current_user.role.lower() == "mentor":
         # Get payments for mentor's bookings
         payments = db.query(Payment).join(Booking).filter(
             Booking.mentor_id == current_user.id
@@ -281,12 +281,12 @@ async def get_my_payments(
     db: Session = Depends(get_db)
 ):
     """Get all payments for the current user (mentee's payments or mentor's earnings)"""
-    if current_user.role == "mentee":
+    print(f"DEBUG /my-payments - User ID: {current_user.id}, Email: {getattr(current_user, 'email', None)}, Role: {current_user.role}")
+    if current_user.role.lower() == "mentee":
         # Get payments made by this mentee
         payments = db.query(Payment).join(Booking).filter(
             Booking.mentee_id == current_user.id
         ).order_by(Payment.created_at.desc()).all()
-        
         return [{
             "id": p.id,
             "booking_id": p.booking_id,
@@ -296,13 +296,11 @@ async def get_my_payments(
             "created_at": p.created_at.isoformat(),
             "succeeded_at": p.succeeded_at.isoformat() if p.succeeded_at else None
         } for p in payments]
-    
-    elif current_user.role == "mentor":
+    elif current_user.role.lower() == "mentor":
         # Get payments received by this mentor
         payments = db.query(Payment).join(Booking).filter(
             Booking.mentor_id == current_user.id
         ).order_by(Payment.created_at.desc()).all()
-        
         return [{
             "id": p.id,
             "booking_id": p.booking_id,
@@ -314,8 +312,8 @@ async def get_my_payments(
             "created_at": p.created_at.isoformat(),
             "succeeded_at": p.succeeded_at.isoformat() if p.succeeded_at else None
         } for p in payments]
-    
     else:
+        print(f"DEBUG /my-payments - Invalid role: {current_user.role}")
         raise HTTPException(status_code=400, detail="Invalid user role")
 
 

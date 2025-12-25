@@ -69,7 +69,7 @@ def create_booking(
     """Create a new booking (mentee only)"""
     
     # Only mentees can book
-    if current_user.role != "mentee":
+    if current_user.role.lower() != "mentee":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only mentees can book sessions"
@@ -78,7 +78,7 @@ def create_booking(
     # Validate mentor exists
     mentor = db.query(User).filter(
         User.id == booking_data.mentor_id,
-        User.role == "mentor"
+        User.role.ilike("mentor")
     ).first()
     if not mentor:
         raise HTTPException(status_code=404, detail="Mentor not found")
@@ -145,11 +145,13 @@ def get_my_bookings(
 ):
     """Get all bookings for current user (as mentee or mentor)"""
     
-    if current_user.role == "mentee":
+    print(f"DEBUG /my-bookings - User ID: {current_user.id}, Email: {getattr(current_user, 'email', None)}, Role: {current_user.role}")
+    if current_user.role.lower() == "mentee":
         query = db.query(Booking).filter(Booking.mentee_id == current_user.id)
-    elif current_user.role == "mentor":
+    elif current_user.role.lower() == "mentor":
         query = db.query(Booking).filter(Booking.mentor_id == current_user.id)
     else:
+        print(f"DEBUG /my-bookings - Invalid role: {current_user.role}")
         raise HTTPException(status_code=403, detail="Invalid role")
     
     if status_filter:
