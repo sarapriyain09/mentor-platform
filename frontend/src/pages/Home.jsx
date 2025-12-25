@@ -6,46 +6,47 @@ export default function Home() {
     <div className="home-page">
       <section className="hero">
         <div className="hero-content">
-          <h1>Connect. Learn. Grow.</h1>
-          <p className="hero-subtitle">
-            The Engineering-Focused Mentorship Platform
-          </p>
+          <h1>Find the right mentor. Even when you don't know where to start.</h1>
           <p className="hero-description">
-            Bridging the gap between experienced engineers and aspiring professionals 
-            through meaningful 1-to-1 mentoring sessions
+            We help you discover your true needs, guide you with AI, and connect you with 
+            experienced human mentors who help you grow—personally and professionally.
           </p>
           <div className="hero-buttons">
-            <Link to="/register" className="btn btn-primary">Get Started</Link>
+            <Link to="/register" className="btn btn-primary">Start Your Mentoring Journey</Link>
           </div>
         </div>
       </section>
 
       <section className="problem-section">
         <div className="section-content">
-          <h2>The Challenge We're Solving</h2>
+          <h2>Why We Exist</h2>
+          <p className="section-intro">
+            Many people want a mentor—but don't know what kind of mentor they need, 
+            what goals to work on, or where to begin. We exist to bridge that gap.
+          </p>
           <div className="problem-grid">
             <div className="problem-card">
-              <div className="problem-icon">🎓</div>
-              <h3>For Students & Early-Career Professionals</h3>
+              <div className="problem-icon">🎯</div>
+              <h3>AI-Guided Discovery</h3>
               <p>
-                Engineering students and early-career professionals lack access to 
-                practical, industry-experienced mentors who can provide real-world guidance.
+                Our AI guide asks thoughtful questions to help you clarify your goals, 
+                challenges, and aspirations.
               </p>
             </div>
             <div className="problem-card">
-              <div className="problem-icon">💸</div>
-              <h3>Generic & Expensive Platforms</h3>
+              <div className="problem-icon">🤝</div>
+              <h3>Thoughtful Matching</h3>
               <p>
-                Existing platforms are either too generic, prohibitively expensive, 
-                or not focused on engineering disciplines.
+                Based on your clarity and preferences, we connect you with mentors who 
+                genuinely align with your journey.
               </p>
             </div>
             <div className="problem-card">
-              <div className="problem-icon">👥</div>
-              <h3>Untapped Mentor Potential</h3>
+              <div className="problem-icon">📈</div>
+              <h3>Continuous Growth</h3>
               <p>
-                Senior engineers are willing to mentor but lack a trusted, 
-                simple platform to monetize their time flexibly.
+                Mentoring doesn't end with a session. We support you with reflection prompts, 
+                progress tracking, and guidance between conversations.
               </p>
             </div>
           </div>
@@ -54,40 +55,37 @@ export default function Home() {
 
       <section className="solution-section">
         <div className="section-content">
-          <h2>Our Solution</h2>
-          <p className="section-intro">
-            A web-based platform designed specifically for the engineering community
-          </p>
+          <h2>What Makes Us Different</h2>
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">✨</div>
-              <h3>For Experienced Engineers</h3>
-              <p>Register as a mentor and share your expertise</p>
+              <div className="feature-icon">🌟</div>
+              <h3>Human-First Mentoring</h3>
+              <p>Technology supports the journey—but growth happens through meaningful human connections</p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">🔍</div>
-              <h3>For Mentees</h3>
-              <p>Search and book 1-to-1 mentoring sessions</p>
+              <div className="feature-icon">🤖</div>
+              <h3>AI That Guides, Not Replaces</h3>
+              <p>Our AI helps you think clearly, prepare better, and get more value from every conversation</p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">📅</div>
-              <h3>Seamless Scheduling</h3>
-              <p>Easy booking and session management</p>
+              <div className="feature-icon">🎯</div>
+              <h3>Outcome-Focused</h3>
+              <p>We focus on clarity, confidence, and real progress—not just meetings on a calendar</p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">💳</div>
-              <h3>Secure Payments</h3>
-              <p>Integrated payment processing</p>
+              <div className="feature-icon">🌱</div>
+              <h3>Built for Individuals</h3>
+              <p>Whether you're starting your career or seeking growth, we meet you where you are</p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">🛡️</div>
-              <h3>Trusted Environment</h3>
-              <p>Engineering-focused community</p>
+              <div className="feature-icon">💡</div>
+              <h3>Clarity Before Advice</h3>
+              <p>Understand yourself first, then find the mentor who can guide you forward</p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">🚀</div>
-              <h3>Free to Start</h3>
-              <p>Initially free, with monetization coming later</p>
+              <div className="feature-icon">📊</div>
+              <h3>Progress Tracking</h3>
+              <p>Reflection prompts and insights to help you measure and celebrate your growth</p>
             </div>
           </div>
         </div>
@@ -95,70 +93,70 @@ export default function Home() {
 
       <section className="value-section">
         <div className="section-content">
-          <h2>Why Join Our Platform?</h2>
+          <h2>Who We Help</h2>
           <div className="value-grid">
-            <div className="value-column">
-              <h3>For Mentors</h3>
-              <ul className="value-list">
-                <li>
-                  <span className="check-icon">✓</span>
-                  <div>
-                    <strong>Earn Income</strong>
-                    <p>Share your expertise and get paid for your time</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  <div>
-                    <strong>Flexible Scheduling</strong>
-                    <p>Set your own availability and rates</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  <div>
-                    <strong>No Upfront Cost</strong>
-                    <p>Free to join initially</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  <div>
-                    <strong>Build Your Brand</strong>
-                    <p>Gain visibility and establish your professional reputation</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
             <div className="value-column">
               <h3>For Mentees</h3>
               <ul className="value-list">
                 <li>
                   <span className="check-icon">✓</span>
                   <div>
-                    <strong>Affordable Access</strong>
-                    <p>Real industry experience without breaking the bank</p>
+                    <strong>Career Starters & Early Professionals</strong>
+                    <p>Finding your path and building confidence in your journey</p>
                   </div>
                 </li>
                 <li>
                   <span className="check-icon">✓</span>
                   <div>
-                    <strong>Engineering-Specific Guidance</strong>
-                    <p>Domain experts who understand your field</p>
+                    <strong>Career Switchers & Returners</strong>
+                    <p>Navigating transitions with clarity and support</p>
                   </div>
                 </li>
                 <li>
                   <span className="check-icon">✓</span>
                   <div>
-                    <strong>Career Clarity</strong>
-                    <p>Get direction on your engineering career path</p>
+                    <strong>Entrepreneurs & Founders</strong>
+                    <p>Getting guidance through the challenges of building</p>
                   </div>
                 </li>
                 <li>
                   <span className="check-icon">✓</span>
                   <div>
-                    <strong>Technical Confidence</strong>
-                    <p>Build skills with guidance from experienced professionals</p>
+                    <strong>Anyone Feeling Stuck</strong>
+                    <p>If you're uncertain or overwhelmed, we help you find clarity</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="value-column">
+              <h3>Our Mentors</h3>
+              <ul className="value-list">
+                <li>
+                  <span className="check-icon">✓</span>
+                  <div>
+                    <strong>Deep Listeners</strong>
+                    <p>Mentors who truly hear what you're going through</p>
+                  </div>
+                </li>
+                <li>
+                  <span className="check-icon">✓</span>
+                  <div>
+                    <strong>Real-World Insight</strong>
+                    <p>Experienced professionals who've walked the path</p>
+                  </div>
+                </li>
+                <li>
+                  <span className="check-icon">✓</span>
+                  <div>
+                    <strong>Structured Guidance</strong>
+                    <p>Thoughtful frameworks that drive meaningful progress</p>
+                  </div>
+                </li>
+                <li>
+                  <span className="check-icon">✓</span>
+                  <div>
+                    <strong>Long-Term Focus</strong>
+                    <p>Mentors who care about your sustainable growth</p>
                   </div>
                 </li>
               </ul>
@@ -169,38 +167,28 @@ export default function Home() {
 
       <section className="target-section">
         <div className="section-content">
-          <h2>Who We Serve</h2>
-          <div className="target-grid">
-            <div className="target-column">
-              <h3>Mentors</h3>
-              <ul>
-                <li>Senior Engineers</li>
-                <li>Engineering Managers</li>
-                <li>Technical Specialists</li>
-              </ul>
-            </div>
-            <div className="target-column">
-              <h3>Mentees</h3>
-              <ul>
-                <li>Final-Year Engineering Students</li>
-                <li>Graduate Engineers</li>
-                <li>Career Switchers into Technology</li>
-              </ul>
-            </div>
+          <h2>Our Promise</h2>
+          <div className="promise-box">
+            <p className="promise-quote">
+              "You don't need to have everything figured out. You just need a place to start."
+            </p>
+            <p className="promise-text">
+              We'll help you find clarity, direction, and the right mentor to walk with you on your journey.
+            </p>
           </div>
         </div>
       </section>
 
       <section className="cta-section">
         <div className="section-content">
-          <h2>Ready to Transform Your Career?</h2>
+          <h2>Start With Clarity</h2>
           <p>
-            Join our platform today and connect with experienced engineering professionals 
-            who can help you achieve your goals.
+            Begin your journey with AI-guided discovery and connect with mentors 
+            who truly understand your goals.
           </p>
           <div className="cta-buttons">
             <Link to="/register" className="btn btn-primary btn-large">
-              Create Your Account
+              Get Started Today
             </Link>
           </div>
           <p style={{ marginTop: '1.5rem', fontSize: '1.1rem' }}>
@@ -213,8 +201,4 @@ export default function Home() {
       </section>
 
       <footer className="home-footer">
-        <p>&copy; 2025 Mentor Platform. Building the future of engineering mentorship.</p>
-      </footer>
-    </div>
-  );
-}
+        <p>&copy; 2025 Mentor Platform. Where clarity meets

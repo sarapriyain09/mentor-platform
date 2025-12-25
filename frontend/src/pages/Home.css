@@ -266,6 +266,31 @@ section h2 {
   background: white;
 }
 
+.promise-box {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 16px;
+  text-align: center;
+  border: 2px solid #667eea30;
+}
+
+.promise-quote {
+  font-size: 1.8rem;
+  font-style: italic;
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.promise-text {
+  font-size: 1.2rem;
+  color: #2d3748;
+  line-height: 1.8;
+}
+
 .target-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
