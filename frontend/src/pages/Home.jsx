@@ -87,6 +87,16 @@ export default function Home() {
               <h3>Progress Tracking</h3>
               <p>Reflection prompts and insights to help you measure and celebrate your growth</p>
             </div>
+            <div className="feature-card">
+              <div className="feature-icon">🔒</div>
+              <h3>Safe & Confidential</h3>
+              <p>A trusted space where you can be vulnerable, ask questions, and explore without judgment</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">🎨</div>
+              <h3>Personalized Journey</h3>
+              <p>Every mentoring relationship is unique—we adapt to your pace, style, and goals</p>
+            </div>
           </div>
         </div>
       </section>
