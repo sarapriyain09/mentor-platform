@@ -15,6 +15,9 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://mendforworks.vercel.app")
 
+# Debug: Log email configuration on startup (mask password)
+print(f"📧 Email Config: SMTP_HOST={SMTP_HOST}, PORT={SMTP_PORT}, USER={SMTP_USER}, FROM={FROM_EMAIL}")
+
 
 def generate_reset_token() -> str:
     """Generate a secure random token for password reset"""
