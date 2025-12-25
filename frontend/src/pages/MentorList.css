@@ -89,6 +89,13 @@
   overflow-y: auto;
 }
 
+.mentor-bio-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.4rem;
+}
+
 .mentor-bio p {
   color: #666;
   margin: 0;

@@ -121,6 +121,7 @@ export default function MentorList() {
               </div>
               
               <div className="mentor-bio">
+                <div className="mentor-bio-label">Bio Summary</div>
                 <p>{mentor.bio}</p>
               </div>
               
