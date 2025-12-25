@@ -275,6 +275,50 @@ async def get_payment_history(
     } for p in payments]
 
 
+@router.get("/my-payments")
+async def get_my_payments(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all payments for the current user (mentee's payments or mentor's earnings)"""
+    if current_user.role == "mentee":
+        # Get payments made by this mentee
+        payments = db.query(Payment).join(Booking).filter(
+            Booking.mentee_id == current_user.id
+        ).order_by(Payment.created_at.desc()).all()
+        
+        return [{
+            "id": p.id,
+            "booking_id": p.booking_id,
+            "amount": p.amount,
+            "currency": p.currency,
+            "status": p.status,
+            "created_at": p.created_at.isoformat(),
+            "succeeded_at": p.succeeded_at.isoformat() if p.succeeded_at else None
+        } for p in payments]
+    
+    elif current_user.role == "mentor":
+        # Get payments received by this mentor
+        payments = db.query(Payment).join(Booking).filter(
+            Booking.mentor_id == current_user.id
+        ).order_by(Payment.created_at.desc()).all()
+        
+        return [{
+            "id": p.id,
+            "booking_id": p.booking_id,
+            "amount": p.amount,
+            "currency": p.currency,
+            "status": p.status,
+            "platform_fee": p.platform_fee,
+            "mentor_payout": p.mentor_payout,
+            "created_at": p.created_at.isoformat(),
+            "succeeded_at": p.succeeded_at.isoformat() if p.succeeded_at else None
+        } for p in payments]
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid user role")
+
+
 @router.get("/test-commission")
 async def test_commission_calculation(amount: float):
     """Test endpoint to verify commission calculation"""
