@@ -1,12 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { API_BASE } from '../api';
+import MentorDashboard from './MentorDashboard';
+import MenteeDashboard from './MenteeDashboard';
 import './Dashboard.css';
 
 export default function Dashboard({ user }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Route to role-specific dashboard if profile exists
+  useEffect(() => {
+    if (!loading && profile && user?.role) {
+      // User has profile, show role-specific dashboard
+      return;
+    }
+  }, [loading, profile, user]);
 
   useEffect(() => {
     fetchProfile();
@@ -30,6 +40,13 @@ export default function Dashboard({ user }) {
   };
 
   if (loading) return <div className="loading">Loading...</div>;
+
+  // If profile exists, show role-specific dashboard
+  if (profile) {
+    return user?.role === 'mentor' ? <MentorDashboard /> : <MenteeDashboard />;
+  }
+
+  // No profile - show onboarding
 
   return (
     <div className="dashboard">
