@@ -9,6 +9,7 @@ from app.routes.ai_agent_routes import router as ai_agent_router
 from app.routes.booking_routes import router as booking_router
 from app.routes.payment_routes import router as payment_router
 from app.routes.feedback_routes import router as feedback_router  # NEW
+from app.routes.chat_routes import router as chat_router
 import app.models.note
 import app.models.user
 import app.models.profile
@@ -17,6 +18,7 @@ import app.models.mentee_intake
 import app.models.booking
 import app.models.payment
 import app.models.feedback  # NEW
+import app.models.message
 from fastapi.middleware.cors import CORSMiddleware
 
 # -------------------------
@@ -51,6 +53,7 @@ app.include_router(ai_agent_router)
 app.include_router(booking_router)
 app.include_router(payment_router)
 app.include_router(feedback_router)  # NEW
+app.include_router(chat_router)
 
 # -------------------------
 # Root & Demo API

@@ -40,6 +40,7 @@ export default function Navbar({ user, setUser }) {
           <Link to="/mentors">Find Mentors</Link>
           <Link to="/bookings">📅 Bookings</Link>
           <Link to="/requests">My Requests</Link>
+          <Link to="/chat">💬 Chat</Link>
           {user.role === 'mentor' && <Link to="/profile/mentor">My Profile</Link>}
           {user.role === 'mentee' && <Link to="/profile/mentee">My Profile</Link>}
           <button onClick={logout} className="btn-logout">Logout</button>

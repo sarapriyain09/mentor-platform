@@ -13,6 +13,7 @@ import Requests from './pages/Requests';
 import AIIntakeFlow from './pages/AIIntakeFlow';
 import Bookings from './pages/Bookings';
 import BookMentor from './pages/BookMentor';
+import Chat from './pages/Chat';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import AvailabilityManager from './components/AvailabilityManager';
@@ -99,6 +100,11 @@ export default function App() {
             <Route path="/book-mentor/:mentorId" element={
               <ProtectedRoute>
                 <BookMentor />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <Chat />
               </ProtectedRoute>
             } />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
