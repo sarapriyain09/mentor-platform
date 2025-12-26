@@ -43,7 +43,7 @@ async def create_checkout_session(
     if booking.mentee_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to pay for this booking")
     
-    if booking.payment_status == "completed":
+    if (booking.payment_status or "").lower() in {"paid", "completed"}:
         raise HTTPException(status_code=400, detail="Booking already paid")
     
     # Check if payment intent already exists
@@ -174,27 +174,26 @@ async def stripe_webhook(
             )
             db.add(payment)
         
-        # Update booking status
-        booking.payment_status = "completed"
+        # Update booking payment status (mentee has paid)
+        booking.payment_status = "paid"
         
         # Update mentor balance
         mentor_balance = db.query(MentorBalance).filter(
             MentorBalance.mentor_id == booking.mentor_id
         ).first()
         
+        # Hold mentor payout until session summary is approved by mentee.
         if not mentor_balance:
-            # Create new balance record
             mentor_balance = MentorBalance(
                 mentor_id=booking.mentor_id,
                 total_earned=mentor_payout,
-                available_balance=mentor_payout,
-                pending_balance=0.0
+                available_balance=0.0,
+                pending_balance=mentor_payout,
             )
             db.add(mentor_balance)
         else:
-            # Update existing balance
             mentor_balance.total_earned += mentor_payout
-            mentor_balance.available_balance += mentor_payout
+            mentor_balance.pending_balance += mentor_payout
             mentor_balance.updated_at = datetime.utcnow()
         
         # Mark commission as paid

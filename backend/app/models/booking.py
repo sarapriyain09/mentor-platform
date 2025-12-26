@@ -30,6 +30,14 @@ class Booking(Base):
     # Notes
     mentee_message = Column(String, nullable=True)  # Why booking
     mentor_notes = Column(String, nullable=True)  # Private notes
+
+    # Session closeout (Zoom/Meet + summary + consent)
+    meeting_link = Column(String, nullable=True)
+    session_summary = Column(String, nullable=True)
+    session_summary_submitted_at = Column(DateTime, nullable=True)
+    mentee_consent = Column(Boolean, nullable=True)  # None=pending, True=approved, False=declined
+    mentee_consent_at = Column(DateTime, nullable=True)
+    mentee_consent_note = Column(String, nullable=True)
     
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)

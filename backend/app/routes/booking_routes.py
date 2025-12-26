@@ -9,17 +9,63 @@ from app.auth import get_current_user
 from app.models.user import User
 from app.models.booking import Booking, Availability, BlockedDate
 from app.models.profile import MentorProfile
+from app.models.payment import Payment, MentorBalance
 from app.schemas.booking_schema import (
     BookingCreate, BookingOut, BookingWithDetails, BookingStatusUpdate,
     AvailabilityCreate, AvailabilityOut, AvailabilityUpdate,
     BlockedDateCreate, BlockedDateOut,
     AvailableSlot, AvailableSlotsResponse
 )
+from pydantic import BaseModel, Field
 
 router = APIRouter(
     prefix="/bookings",
     tags=["Bookings"]
 )
+
+
+class MeetingLinkUpdate(BaseModel):
+    meeting_link: str = Field(..., min_length=8, max_length=500)
+
+
+class SessionSummarySubmit(BaseModel):
+    session_summary: str = Field(..., min_length=10, max_length=10000)
+
+
+class MenteeConsentUpdate(BaseModel):
+    consent: bool
+    note: Optional[str] = Field(None, max_length=500)
+
+
+def _release_mentor_payout_for_booking(db: Session, booking: Booking) -> None:
+    payment = db.query(Payment).filter(Payment.booking_id == booking.id).first()
+    if not payment or (payment.status or "").lower() != "succeeded":
+        raise HTTPException(status_code=400, detail="Payment not completed for this booking")
+
+    if getattr(payment, "payout_released", False):
+        return
+
+    mentor_balance = db.query(MentorBalance).filter(MentorBalance.mentor_id == booking.mentor_id).first()
+    if not mentor_balance:
+        mentor_balance = MentorBalance(mentor_id=booking.mentor_id)
+        db.add(mentor_balance)
+        db.flush()
+
+    mentor_payout = float(payment.mentor_payout or 0.0)
+    pending = float(getattr(mentor_balance, "pending_balance", 0.0) or 0.0)
+    if pending + 1e-9 < mentor_payout:
+        raise HTTPException(
+            status_code=409,
+            detail="Mentor payout is not in pending balance yet. Please contact support.",
+        )
+
+    mentor_balance.pending_balance = pending - mentor_payout
+    mentor_balance.available_balance = float(getattr(mentor_balance, "available_balance", 0.0) or 0.0) + mentor_payout
+    mentor_balance.updated_at = datetime.utcnow()
+
+    payment.payout_released = True
+    payment.payout_released_at = datetime.utcnow()
+    payment.updated_at = datetime.utcnow()
 
 
 def _safe_booking_out_dict(booking: Booking) -> dict:
@@ -43,6 +89,12 @@ def _safe_booking_out_dict(booking: Booking) -> dict:
             "amount": float(booking.amount or 0.0),
             "payment_status": booking.payment_status or "pending",
             "mentee_message": booking.mentee_message,
+            "meeting_link": booking.meeting_link,
+            "session_summary": booking.session_summary,
+            "session_summary_submitted_at": booking.session_summary_submitted_at,
+            "mentee_consent": booking.mentee_consent,
+            "mentee_consent_at": booking.mentee_consent_at,
+            "mentee_consent_note": booking.mentee_consent_note,
             "created_at": booking.created_at,
             "confirmed_at": booking.confirmed_at,
             "completed_at": booking.completed_at,
@@ -285,6 +337,100 @@ def update_booking_status(
     db.commit()
     db.refresh(booking)
     
+    return booking
+
+
+@router.patch("/{booking_id}/meeting-link", response_model=BookingOut)
+def update_booking_meeting_link(
+    booking_id: int,
+    payload: MeetingLinkUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    role = (current_user.role or "").lower()
+    if role != "mentor" or booking.mentor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Only the mentor can set meeting link")
+
+    meeting_link = (payload.meeting_link or "").strip()
+    if not (meeting_link.startswith("https://") or meeting_link.startswith("http://")):
+        raise HTTPException(status_code=400, detail="Meeting link must start with http:// or https://")
+
+    booking.meeting_link = meeting_link
+    booking.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(booking)
+    return booking
+
+
+@router.post("/{booking_id}/submit-summary", response_model=BookingOut)
+def submit_session_summary(
+    booking_id: int,
+    payload: SessionSummarySubmit,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    role = (current_user.role or "").lower()
+    if role != "mentor" or booking.mentor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Only the mentor can submit session summary")
+
+    if booking.status not in ["confirmed", "completed"]:
+        raise HTTPException(status_code=400, detail="Can only submit summary for confirmed/completed bookings")
+
+    booking.session_summary = payload.session_summary.strip()
+    booking.session_summary_submitted_at = datetime.utcnow()
+    booking.mentee_consent = None
+    booking.mentee_consent_at = None
+    booking.mentee_consent_note = None
+
+    # If mentor submits summary, we can treat session as completed.
+    if booking.status != "completed":
+        booking.status = "completed"
+        booking.completed_at = datetime.utcnow()
+
+    booking.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(booking)
+    return booking
+
+
+@router.post("/{booking_id}/mentee-consent", response_model=BookingOut)
+def mentee_consent_for_summary(
+    booking_id: int,
+    payload: MenteeConsentUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    role = (current_user.role or "").lower()
+    if role != "mentee" or booking.mentee_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Only the mentee can approve the session summary")
+
+    if booking.status != "completed":
+        raise HTTPException(status_code=400, detail="Booking must be completed before consent")
+    if not (booking.session_summary or "").strip():
+        raise HTTPException(status_code=400, detail="No session summary submitted yet")
+
+    booking.mentee_consent = bool(payload.consent)
+    booking.mentee_consent_at = datetime.utcnow()
+    booking.mentee_consent_note = (payload.note or "").strip() or None
+    booking.updated_at = datetime.utcnow()
+
+    if booking.mentee_consent:
+        _release_mentor_payout_for_booking(db, booking)
+
+    db.commit()
+    db.refresh(booking)
     return booking
 
 

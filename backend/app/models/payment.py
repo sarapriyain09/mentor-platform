@@ -21,6 +21,10 @@ class Payment(Base):
     platform_fee = Column(Float, nullable=False)  # 10% commission
     mentor_payout = Column(Float, nullable=False)  # 90% to mentor
     commission_paid = Column(Boolean, default=False)
+
+    # Payout gating (release after mentee consent)
+    payout_released = Column(Boolean, default=False)
+    payout_released_at = Column(DateTime, nullable=True)
     
     # Idempotency
     webhook_processed = Column(Boolean, default=False)

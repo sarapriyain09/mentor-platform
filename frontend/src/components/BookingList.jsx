@@ -93,6 +93,90 @@ export default function BookingList() {
     }
   };
 
+  const handleSetMeetingLink = async (bookingId) => {
+    const meetingLink = prompt('Paste Zoom/Google Meet link (https://...)');
+    if (!meetingLink) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/bookings/${bookingId}/meeting-link`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ meeting_link: meetingLink })
+      });
+
+      if (response.ok) {
+        alert('Meeting link saved');
+        fetchBookings();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.detail}`);
+      }
+    } catch (err) {
+      alert('Error saving meeting link');
+      console.error(err);
+    }
+  };
+
+  const handleSubmitSummary = async (bookingId) => {
+    const sessionSummary = prompt('Enter session summary (visible to mentee):');
+    if (!sessionSummary) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/bookings/${bookingId}/submit-summary`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ session_summary: sessionSummary })
+      });
+
+      if (response.ok) {
+        alert('Summary submitted. Waiting for mentee approval.');
+        fetchBookings();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.detail}`);
+      }
+    } catch (err) {
+      alert('Error submitting summary');
+      console.error(err);
+    }
+  };
+
+  const handleMenteeConsent = async (bookingId, consent) => {
+    const note = consent ? null : prompt('Optional note to mentor (why you declined):');
+    if (!consent && note === null) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/bookings/${bookingId}/mentee-consent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ consent, note: note || null })
+      });
+
+      if (response.ok) {
+        alert(consent ? 'Approved. Payment will be released to mentor.' : 'Declined. Mentor will be notified.');
+        fetchBookings();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.detail}`);
+      }
+    } catch (err) {
+      alert('Error submitting consent');
+      console.error(err);
+    }
+  };
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-GB', {
       weekday: 'long',
@@ -206,6 +290,11 @@ export default function BookingList() {
             const isMentor = userRole === 'mentor';
             const otherPerson = isMentor ? booking.mentee_name : booking.mentor_name;
             const otherEmail = isMentor ? booking.mentee_email : booking.mentor_email;
+            const hasMeetingLink = !!(booking.meeting_link || '').trim();
+            const hasSummary = !!(booking.session_summary || '').trim();
+            const consent = booking.mentee_consent;
+            const consentPending = consent === null || consent === undefined;
+            const consentLabel = consent === true ? '✅ Approved' : consent === false ? '❌ Declined' : '⏳ Pending';
 
             return (
               <div key={booking.id} className="booking-card">
@@ -259,6 +348,30 @@ export default function BookingList() {
                   </div>
                 )}
 
+                {(hasMeetingLink || (isMentor && (booking.status === 'confirmed' || booking.status === 'completed'))) && (
+                  <div className="booking-message">
+                    <strong>Meeting link:</strong>
+                    {hasMeetingLink ? (
+                      <p>
+                        <a href={booking.meeting_link} target="_blank" rel="noreferrer">{booking.meeting_link}</a>
+                      </p>
+                    ) : (
+                      <p>Not set yet</p>
+                    )}
+                  </div>
+                )}
+
+                {hasSummary && (
+                  <div className="booking-message">
+                    <strong>Session summary:</strong>
+                    <p>{booking.session_summary}</p>
+                    <p><strong>Mentee confirmation:</strong> {consentLabel}</p>
+                    {booking.mentee_consent_note && (
+                      <p><strong>Note:</strong> {booking.mentee_consent_note}</p>
+                    )}
+                  </div>
+                )}
+
                 {/* Action Buttons */}
                 <div className="booking-actions">
                   {/* Mentor Actions */}
@@ -282,16 +395,45 @@ export default function BookingList() {
                   {isMentor && booking.status === 'confirmed' && (
                     <>
                       <button
+                        className="btn-info"
+                        onClick={() => handleSetMeetingLink(booking.id)}
+                      >
+                        🔗 Set Meeting Link
+                      </button>
+                      <button
                         className="btn-complete"
                         onClick={() => handleComplete(booking.id)}
                       >
                         ✅ Mark Completed
                       </button>
                       <button
+                        className="btn-info"
+                        onClick={() => handleSubmitSummary(booking.id)}
+                      >
+                        📝 Submit Summary
+                      </button>
+                      <button
                         className="btn-cancel-booking"
                         onClick={() => handleCancel(booking.id)}
                       >
                         Cancel
+                      </button>
+                    </>
+                  )}
+
+                  {isMentor && booking.status === 'completed' && (
+                    <>
+                      <button
+                        className="btn-info"
+                        onClick={() => handleSetMeetingLink(booking.id)}
+                      >
+                        🔗 Set Meeting Link
+                      </button>
+                      <button
+                        className="btn-info"
+                        onClick={() => handleSubmitSummary(booking.id)}
+                      >
+                        📝 Update Summary
                       </button>
                     </>
                   )}
@@ -315,11 +457,25 @@ export default function BookingList() {
                     </button>
                   )}
 
-                  {booking.status === 'completed' && (
-                    <button
-                      className="btn-info"
-                      disabled
-                    >
+                  {booking.status === 'completed' && !isMentor && hasSummary && consentPending && (
+                    <>
+                      <button
+                        className="btn-confirm"
+                        onClick={() => handleMenteeConsent(booking.id, true)}
+                      >
+                        ✅ Approve Summary
+                      </button>
+                      <button
+                        className="btn-cancel-booking"
+                        onClick={() => handleMenteeConsent(booking.id, false)}
+                      >
+                        ❌ Decline
+                      </button>
+                    </>
+                  )}
+
+                  {booking.status === 'completed' && !isMentor && (!hasSummary || !consentPending) && (
+                    <button className="btn-info" disabled>
                       Session Completed
                     </button>
                   )}

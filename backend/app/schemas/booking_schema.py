@@ -25,6 +25,12 @@ class BookingOut(BaseModel):
     amount: float
     payment_status: str
     mentee_message: Optional[str]
+    meeting_link: Optional[str] = None
+    session_summary: Optional[str] = None
+    session_summary_submitted_at: Optional[datetime] = None
+    mentee_consent: Optional[bool] = None
+    mentee_consent_at: Optional[datetime] = None
+    mentee_consent_note: Optional[str] = None
     created_at: datetime
     confirmed_at: Optional[datetime]
     completed_at: Optional[datetime]
