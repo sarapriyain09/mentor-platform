@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from datetime import datetime, date, time, timedelta
 from typing import Optional
+from pydantic import ValidationError
 from app.database import get_db
 from app.auth import get_current_user
 from app.models.user import User
@@ -19,6 +20,35 @@ router = APIRouter(
     prefix="/bookings",
     tags=["Bookings"]
 )
+
+
+def _safe_booking_out_dict(booking: Booking) -> dict:
+    """Return a BookingOut-shaped dict with defensive defaults.
+
+    Some older rows may have NULLs for fields that are required in the current
+    Pydantic schema (e.g. payment_status). This prevents a 500 in list/detail.
+    """
+    try:
+        return BookingOut.model_validate(booking).model_dump()
+    except ValidationError:
+        return {
+            "id": booking.id,
+            "mentee_id": booking.mentee_id,
+            "mentor_id": booking.mentor_id,
+            "session_date": booking.session_date,
+            "start_time": booking.start_time,
+            "end_time": booking.end_time,
+            "duration_minutes": booking.duration_minutes,
+            "status": booking.status or "requested",
+            "amount": float(booking.amount or 0.0),
+            "payment_status": booking.payment_status or "pending",
+            "mentee_message": booking.mentee_message,
+            "created_at": booking.created_at,
+            "confirmed_at": booking.confirmed_at,
+            "completed_at": booking.completed_at,
+            "cancelled_at": booking.cancelled_at,
+            "cancellation_reason": booking.cancellation_reason,
+        }
 
 
 # ============= HELPER FUNCTIONS =============
@@ -69,7 +99,8 @@ def create_booking(
     """Create a new booking (mentee only)"""
     
     # Only mentees can book
-    if current_user.role.lower() != "mentee":
+    role = (current_user.role or "").lower()
+    if role != "mentee":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only mentees can book sessions"
@@ -146,9 +177,10 @@ def get_my_bookings(
     """Get all bookings for current user (as mentee or mentor)"""
     
     print(f"DEBUG /my-bookings - User ID: {current_user.id}, Email: {getattr(current_user, 'email', None)}, Role: {current_user.role}")
-    if current_user.role.lower() == "mentee":
+    role = (current_user.role or "").lower()
+    if role == "mentee":
         query = db.query(Booking).filter(Booking.mentee_id == current_user.id)
-    elif current_user.role.lower() == "mentor":
+    elif role == "mentor":
         query = db.query(Booking).filter(Booking.mentor_id == current_user.id)
     else:
         print(f"DEBUG /my-bookings - Invalid role: {current_user.role}")
@@ -165,11 +197,11 @@ def get_my_bookings(
         mentor = db.query(User).filter(User.id == booking.mentor_id).first()
         mentee = db.query(User).filter(User.id == booking.mentee_id).first()
         
-        booking_dict = BookingOut.model_validate(booking).model_dump()
-        booking_dict["mentor_name"] = mentor.full_name if mentor else "Unknown"
-        booking_dict["mentee_name"] = mentee.full_name if mentee else "Unknown"
-        booking_dict["mentor_email"] = mentor.email if mentor else ""
-        booking_dict["mentee_email"] = mentee.email if mentee else ""
+        booking_dict = _safe_booking_out_dict(booking)
+        booking_dict["mentor_name"] = getattr(mentor, "full_name", None) or "Unknown"
+        booking_dict["mentee_name"] = getattr(mentee, "full_name", None) or "Unknown"
+        booking_dict["mentor_email"] = getattr(mentor, "email", None) or ""
+        booking_dict["mentee_email"] = getattr(mentee, "email", None) or ""
         
         result.append(BookingWithDetails(**booking_dict))
     
@@ -195,11 +227,11 @@ def get_booking(
     mentor = db.query(User).filter(User.id == booking.mentor_id).first()
     mentee = db.query(User).filter(User.id == booking.mentee_id).first()
     
-    booking_dict = BookingOut.model_validate(booking).model_dump()
-    booking_dict["mentor_name"] = mentor.full_name if mentor else "Unknown"
-    booking_dict["mentee_name"] = mentee.full_name if mentee else "Unknown"
-    booking_dict["mentor_email"] = mentor.email if mentor else ""
-    booking_dict["mentee_email"] = mentee.email if mentee else ""
+    booking_dict = _safe_booking_out_dict(booking)
+    booking_dict["mentor_name"] = getattr(mentor, "full_name", None) or "Unknown"
+    booking_dict["mentee_name"] = getattr(mentee, "full_name", None) or "Unknown"
+    booking_dict["mentor_email"] = getattr(mentor, "email", None) or ""
+    booking_dict["mentee_email"] = getattr(mentee, "email", None) or ""
     
     return BookingWithDetails(**booking_dict)
 
