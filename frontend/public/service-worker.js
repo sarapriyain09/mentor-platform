@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mendforworks-v2';
+const CACHE_NAME = 'mendforworks-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -39,15 +39,16 @@ self.addEventListener('activate', (event) => {
 
 // Fetch strategy: Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
-  if (event.request.method !== 'GET') {
-    event.respondWith(fetch(event.request));
+  // Never intercept cross-origin requests (e.g., API calls to Render).
+  // Intercepting them can create hard-to-debug CORS-like failures if a cached
+  // response is served without the right headers.
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) {
     return;
   }
 
-  // Don't cache API requests
-  if (event.request.url.includes('/api/') || 
-      event.request.url.includes('mentor-platform-t9g9.onrender.com')) {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
     event.respondWith(fetch(event.request));
     return;
   }

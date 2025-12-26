@@ -31,6 +31,10 @@ export default function Dashboard({ user }) {
       if (res.ok) {
         const data = await res.json();
         setProfile(data);
+      } else if (res.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        navigate('/login');
       }
     } catch (err) {
       console.error('Failed to fetch profile:', err);

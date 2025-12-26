@@ -31,6 +31,10 @@ export default function BookingList() {
       if (response.ok) {
         const data = await response.json();
         setBookings(data);
+      } else if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        navigate('/login');
       } else {
         setError('Failed to load bookings');
       }
