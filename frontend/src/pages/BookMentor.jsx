@@ -27,8 +27,27 @@ export default function BookMentor() {
       if (response.ok) {
         const data = await response.json();
         setMentor(data);
+      } else if (response.status === 404) {
+        // Backward-compatible fallback: older deployments may not have /profiles/mentor/{id}
+        const listRes = await fetch(`${API_BASE}/profiles/mentors`);
+        if (!listRes.ok) {
+          setError('Mentor not found');
+          return;
+        }
+
+        const mentors = await listRes.json();
+        const numericMentorId = Number(mentorId);
+        const found = Array.isArray(mentors)
+          ? mentors.find((m) => Number(m.user_id) === numericMentorId)
+          : null;
+
+        if (found) {
+          setMentor(found);
+        } else {
+          setError('Mentor not found');
+        }
       } else {
-        setError('Mentor not found');
+        setError('Error loading mentor details');
       }
     } catch (err) {
       setError('Error loading mentor details');
