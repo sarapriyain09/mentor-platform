@@ -105,6 +105,65 @@ def _add_password_reset_columns():
 
 _add_password_reset_columns()
 
+
+# -------------------------
+# Auto-migrate: Add booking closeout + payout gating columns
+# -------------------------
+def _add_session_closeout_columns():
+    """Add missing columns for session closeout and payout gating.
+
+    This repo doesn't use Alembic; keep production resilient by adding
+    new columns when the app boots.
+    """
+    from sqlalchemy import text, inspect
+
+    try:
+        inspector = inspect(engine)
+        booking_columns = {col["name"] for col in inspector.get_columns("bookings")}
+        payment_columns = {col["name"] for col in inspector.get_columns("payments")}
+
+        with engine.connect() as conn:
+            # bookings
+            if "meeting_link" not in booking_columns:
+                conn.execute(text("ALTER TABLE bookings ADD COLUMN meeting_link VARCHAR"))
+                conn.commit()
+                print("✅ Added bookings.meeting_link")
+            if "session_summary" not in booking_columns:
+                conn.execute(text("ALTER TABLE bookings ADD COLUMN session_summary TEXT"))
+                conn.commit()
+                print("✅ Added bookings.session_summary")
+            if "session_summary_submitted_at" not in booking_columns:
+                conn.execute(text("ALTER TABLE bookings ADD COLUMN session_summary_submitted_at TIMESTAMP"))
+                conn.commit()
+                print("✅ Added bookings.session_summary_submitted_at")
+            if "mentee_consent" not in booking_columns:
+                conn.execute(text("ALTER TABLE bookings ADD COLUMN mentee_consent BOOLEAN"))
+                conn.commit()
+                print("✅ Added bookings.mentee_consent")
+            if "mentee_consent_at" not in booking_columns:
+                conn.execute(text("ALTER TABLE bookings ADD COLUMN mentee_consent_at TIMESTAMP"))
+                conn.commit()
+                print("✅ Added bookings.mentee_consent_at")
+            if "mentee_consent_note" not in booking_columns:
+                conn.execute(text("ALTER TABLE bookings ADD COLUMN mentee_consent_note VARCHAR"))
+                conn.commit()
+                print("✅ Added bookings.mentee_consent_note")
+
+            # payments
+            if "payout_released" not in payment_columns:
+                conn.execute(text("ALTER TABLE payments ADD COLUMN payout_released BOOLEAN DEFAULT FALSE"))
+                conn.commit()
+                print("✅ Added payments.payout_released")
+            if "payout_released_at" not in payment_columns:
+                conn.execute(text("ALTER TABLE payments ADD COLUMN payout_released_at TIMESTAMP"))
+                conn.commit()
+                print("✅ Added payments.payout_released_at")
+    except Exception as e:
+        print(f"Session closeout migration check: {str(e)}")
+
+
+_add_session_closeout_columns()
+
 # -------------------------
 # Seed demo note
 # -------------------------
