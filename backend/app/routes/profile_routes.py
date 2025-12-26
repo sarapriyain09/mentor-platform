@@ -173,3 +173,19 @@ def list_mentors(db: Session = Depends(get_db)):
     """List all mentor profiles (public endpoint for mentee search)"""
     mentors = db.query(MentorProfile).all()
     return mentors
+
+
+# -------------------------
+# Get Mentor Profile by Mentor User ID
+# -------------------------
+@router.get("/mentor/{mentor_id}", response_model=MentorProfileOut)
+def get_mentor_profile(
+    mentor_id: int,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+):
+    """Get a mentor profile by the mentor's user id (authenticated endpoint)."""
+    mentor_profile = db.query(MentorProfile).filter(MentorProfile.user_id == mentor_id).first()
+    if not mentor_profile:
+        raise HTTPException(status_code=404, detail="Mentor not found")
+    return mentor_profile
