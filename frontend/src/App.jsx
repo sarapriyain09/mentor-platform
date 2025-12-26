@@ -15,6 +15,7 @@ import Bookings from './pages/Bookings';
 import BookMentor from './pages/BookMentor';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import AvailabilityManager from './components/AvailabilityManager';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import './App.css';
@@ -22,6 +23,15 @@ import './App.css';
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" />;
+}
+
+function MentorOnlyRoute({ children }) {
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
+
+  if (!token) return <Navigate to="/login" />;
+  if (role !== 'mentor') return <Navigate to="/dashboard" />;
+  return children;
 }
 
 export default function App() {
@@ -80,6 +90,11 @@ export default function App() {
               <ProtectedRoute>
                 <Bookings />
               </ProtectedRoute>
+            } />
+            <Route path="/availability-manager" element={
+              <MentorOnlyRoute>
+                <AvailabilityManager />
+              </MentorOnlyRoute>
             } />
             <Route path="/book-mentor/:mentorId" element={
               <ProtectedRoute>
