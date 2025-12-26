@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mendforworks-v3';
+const CACHE_NAME = 'mendforworks-v4';
 const urlsToCache = [
   '/',
   '/index.html',
