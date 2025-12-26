@@ -42,6 +42,9 @@ async def create_checkout_session(
     
     if booking.mentee_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to pay for this booking")
+
+    if (booking.status or "").lower() != "confirmed":
+        raise HTTPException(status_code=400, detail="Booking must be confirmed by the mentor before payment")
     
     if (booking.payment_status or "").lower() in {"paid", "completed"}:
         raise HTTPException(status_code=400, detail="Booking already paid")

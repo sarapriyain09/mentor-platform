@@ -177,6 +177,37 @@ export default function BookingList() {
     }
   };
 
+  const handlePayNow = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const successUrl = `${window.location.origin}/bookings?payment=success`;
+      const cancelUrl = `${window.location.origin}/bookings?payment=cancel`;
+      const url = `${API_BASE}/payments/create-checkout-session?booking_id=${encodeURIComponent(bookingId)}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data?.checkout_url) {
+          window.location.href = data.checkout_url;
+          return;
+        }
+        alert('Payment session created, but checkout URL is missing');
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.detail || 'Failed to start payment'}`);
+      }
+    } catch (err) {
+      alert('Error starting payment');
+      console.error(err);
+    }
+  };
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-GB', {
       weekday: 'long',
@@ -449,12 +480,22 @@ export default function BookingList() {
                   )}
 
                   {!isMentor && booking.status === 'confirmed' && (
-                    <button
-                      className="btn-cancel-booking"
-                      onClick={() => handleCancel(booking.id)}
-                    >
-                      Cancel Booking
-                    </button>
+                    <>
+                      {(booking.payment_status || '').toLowerCase() !== 'paid' && (
+                        <button
+                          className="btn-confirm"
+                          onClick={() => handlePayNow(booking.id)}
+                        >
+                          💳 Pay Now
+                        </button>
+                      )}
+                      <button
+                        className="btn-cancel-booking"
+                        onClick={() => handleCancel(booking.id)}
+                      >
+                        Cancel Booking
+                      </button>
+                    </>
                   )}
 
                   {booking.status === 'completed' && !isMentor && hasSummary && consentPending && (
