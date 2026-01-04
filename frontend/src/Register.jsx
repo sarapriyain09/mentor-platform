@@ -48,6 +48,9 @@ export default function Register() {
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
         <SocialAuthButtons intent="register" role={form.role} />
+        <p className="social-disabled-note">
+          Social logins are temporarily unavailable. Please sign up with your email instead.
+        </p>
         <form onSubmit={submit}>
           <input 
             placeholder="Email"
