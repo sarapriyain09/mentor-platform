@@ -31,10 +31,38 @@ export default function AIIntakeAgent({ onComplete }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const describeAgentError = async (res) => {
+    let detail = '';
+    try {
+      const data = await res.json();
+      detail = data?.detail || data?.message || '';
+    } catch (parseErr) {
+      console.warn('Unable to parse AI agent error response:', parseErr);
+    }
+
+    if (res.status === 401) {
+      addMessage('ai', detail || 'Your session expired. Please log in again to continue.');
+      return;
+    }
+
+    if (res.status === 403) {
+      addMessage('ai', detail || 'Only mentees can run the AI intake right now.');
+      return;
+    }
+
+    addMessage('ai', detail ? `Error: ${detail}` : 'Sorry, I encountered an error starting the conversation. Please refresh and try again.');
+  };
+
   const startConversation = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
+
+      if (!token) {
+        addMessage('ai', 'Please log in as a mentee to start the AI intake conversation.');
+        return;
+      }
+
       const res = await fetch(`${API_BASE}/ai-agent/chat`, {
         method: 'POST',
         headers: {
@@ -51,7 +79,7 @@ export default function AIIntakeAgent({ onComplete }) {
         const data = await res.json();
         addMessage('ai', data.message, data.question_type);
       } else {
-        addMessage('ai', 'Sorry, I encountered an error starting the conversation. Please refresh and try again.');
+        await describeAgentError(res);
       }
     } catch (err) {
       console.error('Failed to start conversation:', err);
@@ -140,6 +168,11 @@ export default function AIIntakeAgent({ onComplete }) {
 
     try {
       const token = localStorage.getItem('token');
+
+      if (!token) {
+        addMessage('ai', 'Please log in again to continue the conversation.');
+        return;
+      }
       
       const res = await fetch(`${API_BASE}/ai-agent/chat`, {
         method: 'POST',
@@ -162,8 +195,7 @@ export default function AIIntakeAgent({ onComplete }) {
           await saveIntakeAndGetMatches();
         }
       } else {
-        const error = await res.json();
-        addMessage('ai', `Error: ${error.detail || 'Something went wrong. Please try again.'}`);
+        await describeAgentError(res);
       }
     } catch (err) {
       console.error('Failed to send message:', err);

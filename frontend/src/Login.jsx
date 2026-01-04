@@ -1,12 +1,23 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginUser } from "./api";
 import './Auth.css';
+import SocialAuthButtons from "./components/SocialAuthButtons";
 
 export default function Login({ setUser }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const socialError = params.get("error");
+    if (socialError) {
+      setError(socialError);
+      navigate("/login", { replace: true });
+    }
+  }, [location.search, navigate]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -33,6 +44,7 @@ export default function Login({ setUser }) {
       <div className="auth-box">
         <h2>Login</h2>
         {error && <div className="error">{error}</div>}
+        <SocialAuthButtons intent="login" />
         <form onSubmit={submit}>
           <input 
             placeholder="Email"

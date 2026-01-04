@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "./api";
 import './Auth.css';
+import SocialAuthButtons from "./components/SocialAuthButtons";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -46,6 +47,7 @@ export default function Register() {
         <h2>Register</h2>
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
+        <SocialAuthButtons intent="register" role={form.role} />
         <form onSubmit={submit}>
           <input 
             placeholder="Email"

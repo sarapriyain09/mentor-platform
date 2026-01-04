@@ -5,6 +5,7 @@ import Login from './Login';
 import Register from './Register';
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
+import SocialCallback from './SocialCallback';
 import Dashboard from './pages/Dashboard';
 import MentorProfile from './pages/MentorProfile';
 import MenteeProfile from './pages/MenteeProfile';
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/oauth/callback" element={<SocialCallback setUser={setUser} />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard user={user} />

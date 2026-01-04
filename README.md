@@ -26,8 +26,9 @@ API demo
 
 Environment variables
 
-- Backend: set `DATABASE_URL` and `SECRET_KEY` for production. Local defaults use SQLite at `backend/mentor.db`.
+- Backend: set `DATABASE_URL` and `SECRET_KEY` for production. Local defaults use SQLite at `backend/mentor.db`. When targeting Postgres locally, install the bundled psycopg3 driver (already listed in `backend/requirements.txt`) and ensure your `DATABASE_URL` starts with `postgresql+psycopg://`.
 - Frontend: set `REACT_APP_API_URL` to your deployed API URL (default: `http://localhost:8000`).
+- Social login: configure `FRONTEND_APP_URL`, `SOCIAL_AUTH_REDIRECT_URL`, `LINKEDIN_CLIENT_ID/SECRET/REDIRECT_URI`, and `GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI`. The redirect URIs must point to the backend callbacks (`/auth/oauth/linkedin/callback` and `/auth/oauth/google/callback`).
 
 Deploy suggestions
 
