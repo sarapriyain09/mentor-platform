@@ -1,0 +1,132 @@
+{
+  "site": {
+    "domain": "https://www.mendforworks.com",
+    "notes": [
+      "Primary keywords are the exact phrases to prioritize in title/H1/intro and internal anchors.",
+      "Secondary keywords are natural variations to include in headings and body copy without stuffing.",
+      "URLs should stay stable; update content/lastmod instead of changing slugs."
+    ]
+  },
+  "posts": {
+    "how-to-find-the-right-career-mentor-uk": {
+      "url": "/blog/how-to-find-the-right-career-mentor-uk",
+      "primary_keywords": [
+        "career mentor UK",
+        "find a career mentor in the UK",
+        "how to find a mentor in the UK"
+      ],
+      "secondary_keywords": [
+        "career mentoring UK",
+        "online mentor UK",
+        "professional mentor UK"
+      ],
+      "search_intent": "Informational (find mentor) → conversion",
+      "suggested_title_tag": "How to Find the Right Career Mentor in the UK (Step-by-Step) | MendForWorks",
+      "suggested_meta_description": "Learn how to find the right career mentor in the UK with a step-by-step approach, common mistakes to avoid, and how to get started with MendForWorks.",
+      "internal_links_out": [
+        "/blog/mentor-vs-coach-vs-manager",
+        "/blog/why-mentorship-is-important-every-stage",
+        "/blog/how-mentorship-helps-students-and-graduates"
+      ]
+    },
+    "mentor-vs-coach-vs-manager": {
+      "url": "/blog/mentor-vs-coach-vs-manager",
+      "primary_keywords": [
+        "mentor vs coach vs manager"
+      ],
+      "secondary_keywords": [
+        "difference between mentor and coach",
+        "mentor vs manager",
+        "coach vs mentor"
+      ],
+      "search_intent": "Informational/comparison",
+      "suggested_title_tag": "Mentor vs Coach vs Manager: What’s the Difference? | MendForWorks",
+      "suggested_meta_description": "Confused about mentoring vs coaching vs management? Learn the differences, when you need each, and how mentorship supports long-term career growth.",
+      "internal_links_out": [
+        "/blog/how-to-find-the-right-career-mentor-uk",
+        "/blog/why-mentorship-is-important-every-stage",
+        "/blog/why-leadership-mentorship-is-essential"
+      ]
+    },
+    "why-mentorship-is-important-every-stage": {
+      "url": "/blog/why-mentorship-is-important-every-stage",
+      "primary_keywords": [
+        "why mentorship is important",
+        "benefits of mentorship"
+      ],
+      "secondary_keywords": [
+        "mentorship benefits for career",
+        "career mentorship benefits",
+        "mentorship at every career stage"
+      ],
+      "search_intent": "Informational",
+      "suggested_title_tag": "Why Mentorship Is Important at Every Stage of Your Career | MendForWorks",
+      "suggested_meta_description": "Discover why mentorship matters at every career stage—from early career to leadership—and how it builds clarity, momentum, and confidence.",
+      "internal_links_out": [
+        "/blog/how-to-find-the-right-career-mentor-uk",
+        "/blog/why-every-engineer-needs-a-mentor",
+        "/blog/why-leadership-mentorship-is-essential"
+      ]
+    },
+    "why-every-engineer-needs-a-mentor": {
+      "url": "/blog/why-every-engineer-needs-a-mentor",
+      "primary_keywords": [
+        "engineering mentor",
+        "mentor for engineers",
+        "software engineer mentor"
+      ],
+      "secondary_keywords": [
+        "software engineering mentorship",
+        "tech career mentor",
+        "engineer career growth"
+      ],
+      "search_intent": "Informational (engineers) → conversion",
+      "suggested_title_tag": "Why Every Engineer Needs a Mentor to Grow Faster | MendForWorks",
+      "suggested_meta_description": "Mentorship helps engineers grow faster by improving communication, decision-making, and promotion readiness—beyond technical skills.",
+      "internal_links_out": [
+        "/blog/how-to-find-the-right-career-mentor-uk",
+        "/blog/mentor-vs-coach-vs-manager"
+      ]
+    },
+    "how-mentorship-helps-students-and-graduates": {
+      "url": "/blog/how-mentorship-helps-students-and-graduates",
+      "primary_keywords": [
+        "mentor for students",
+        "graduate career mentor",
+        "mentorship for graduates"
+      ],
+      "secondary_keywords": [
+        "student mentorship UK",
+        "career mentor for graduates UK",
+        "graduate mentoring"
+      ],
+      "search_intent": "Informational (students/graduates) → conversion",
+      "suggested_title_tag": "How Mentorship Helps Students and Graduates Build Successful Careers | MendForWorks",
+      "suggested_meta_description": "Learn how mentorship helps students and graduates gain clarity, prepare for interviews, and transition confidently from education to employment.",
+      "internal_links_out": [
+        "/blog/how-to-find-the-right-career-mentor-uk",
+        "/blog/why-mentorship-is-important-every-stage"
+      ]
+    },
+    "why-leadership-mentorship-is-essential": {
+      "url": "/blog/why-leadership-mentorship-is-essential",
+      "primary_keywords": [
+        "leadership mentorship",
+        "leadership mentoring",
+        "mentor for managers"
+      ],
+      "secondary_keywords": [
+        "executive mentor",
+        "management mentoring",
+        "leadership development mentor"
+      ],
+      "search_intent": "Informational (leaders/managers) → conversion",
+      "suggested_title_tag": "Why Leadership Mentorship Is Essential for Long-Term Success | MendForWorks",
+      "suggested_meta_description": "Leadership can be isolating. Learn how mentorship supports better decision-making, reflection, resilience, and long-term leadership growth.",
+      "internal_links_out": [
+        "/blog/mentor-vs-coach-vs-manager",
+        "/blog/why-mentorship-is-important-every-stage"
+      ]
+    }
+  }
+}

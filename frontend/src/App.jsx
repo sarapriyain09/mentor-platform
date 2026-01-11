@@ -17,6 +17,8 @@ import BookMentor from './pages/BookMentor';
 import Chat from './pages/Chat';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import BlogIndex from './pages/BlogIndex';
+import BlogPost from './pages/BlogPost';
 import AvailabilityManager from './components/AvailabilityManager';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -54,6 +56,8 @@ export default function App() {
         <div className="container">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/blog" element={<BlogIndex />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

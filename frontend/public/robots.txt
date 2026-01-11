@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /oauth/
+Disallow: /dashboard
+Disallow: /profile/
+Disallow: /mentors
+Disallow: /ai-match
+Disallow: /requests
+Disallow: /bookings
+Disallow: /availability-manager
+Disallow: /book-mentor/
+Disallow: /chat
+
+Sitemap: https://www.mendforworks.com/sitemap.xml
